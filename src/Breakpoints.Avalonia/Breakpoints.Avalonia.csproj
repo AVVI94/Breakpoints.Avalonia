@@ -15,6 +15,7 @@
 		<AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
 		<RootNamespace>AVVI94.Breakpoints.Avalonia</RootNamespace>
 		<AssemblyName>$(RootNamespace)</AssemblyName>
+		<PackageTags>Avalonia, breakpoints, responsivity, responsive, desktop</PackageTags>
 	</PropertyGroup>
 
 	<ItemGroup>

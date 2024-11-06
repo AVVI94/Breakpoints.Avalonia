@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using AVVI94.Breakpoints.Avalonia.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
@@ -67,7 +68,7 @@ public class Breakpoints
             if (e.Property.Name == nameof(element.Width))
             {
                 var vals = GetValues(element);
-                if(vals is null)
+                if (vals is null)
                 {
                     return;
                 }
@@ -128,7 +129,7 @@ public class Breakpoints
     /// <returns>
     /// <see langword="true"/> if the breakpoint provider was found, otherwise <see langword="false"/>.
     /// </returns>
-    public static bool TryFindBreakpointProvider(Visual? element, out Layoutable? provider)
+    public static bool TryFindBreakpointProvider([NotNullWhen(true)] Visual? element, [NotNullWhen(true)] out Layoutable? provider)
     {
         if (element is null)
         {
@@ -173,7 +174,7 @@ public class Breakpoints
     /// <returns>
     /// <see langword="true"/> if the breakpoints were found, otherwise <see langword="false"/>.
     /// </returns>
-    public static bool TryFindBreakpoints(Visual? element, out BreakpointList? breakpoints, out Layoutable? provider)
+    public static bool TryFindBreakpoints([NotNullWhen(true)] Visual? element, [NotNullWhen(true)] out BreakpointList? breakpoints, [NotNullWhen(true)] out Layoutable? provider)
     {
         if (element is null)
         {
@@ -237,7 +238,7 @@ public class Breakpoints
     /// </returns>
     public static bool ShouldBeVisible(Visual element, string breakpoint, bool exclusive = false)
     {
-        if (!TryFindBreakpoints(element, out var breakpoints, out var provider))
+        if (!TryFindBreakpoints(element, out _, out var provider))
         {
             return true;
         }
@@ -287,7 +288,7 @@ public class Breakpoints
     /// </returns>
     public static bool IsBetween(Visual element, string lower, string upper)
     {
-        if (!TryFindBreakpoints(element, out var breakpoints, out var provider))
+        if (!TryFindBreakpoints(element, out _, out var provider))
         {
             return true;
         }

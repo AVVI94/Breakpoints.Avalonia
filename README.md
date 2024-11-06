@@ -46,7 +46,7 @@ In your `App.axaml` file, add the `ResponsivityBreakpoints` resource:
 ```xml
 <Application.Styles>
     <FluentTheme />
-	<ResponsivityBreakpoints />
+    <ResponsivityBreakpoints />
 </Application.Styles>	
 ```
 
@@ -153,7 +153,7 @@ Control parameters:
 
 ### Using the Breakpoint markup extension
 
-You can also use the markup extension with predefined breakpoint names (not values, just names). This extension usage is similar to the official OnPlatform extension.
+You can also use the markup extension with predefined breakpoint names (not values, just names). This extension usage is similar to the official OnPlatform extension. Names of the breakpoints in the BreakpointList must match properties of the Breakpoint markup extension class (Default property is excluded).
 
 ```XML
  <StackPanel Orientation="{Breakpoint Vertical, M=Horizontal}">

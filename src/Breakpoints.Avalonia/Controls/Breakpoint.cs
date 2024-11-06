@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.VisualTree;
@@ -9,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Avalonia.Responsivity.Breakpoints.Controls;
+namespace Breakpoints.Avalonia.Controls;
 
 public class Breakpoint : ContentControl
 {
@@ -17,7 +18,7 @@ public class Breakpoint : ContentControl
     /// Enabled StyledProperty definition
     /// </summary>
     public static readonly StyledProperty<bool> EnabledProperty =
-        AvaloniaProperty.Register<Breakpoint, bool>(nameof(Enabled), true, defaultBindingMode: Data.BindingMode.TwoWay);
+        AvaloniaProperty.Register<Breakpoint, bool>(nameof(Enabled), true, defaultBindingMode: BindingMode.TwoWay);
 
     /// <summary>
     /// Gets or sets the Enabled property.

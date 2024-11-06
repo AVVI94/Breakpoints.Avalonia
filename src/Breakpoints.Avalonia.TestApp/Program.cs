@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace Avalonia.Responsivity.Breakpoints.TestApp
+namespace Breakpoints.Avalonia.TestApp
 {
     internal class Program
     {

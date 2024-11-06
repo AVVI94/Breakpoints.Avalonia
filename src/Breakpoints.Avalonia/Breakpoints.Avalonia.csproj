@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<SignAssembly>True</SignAssembly>
+		<DelaySign>False</DelaySign>
+		<Title>$(AssemblyName)</Title>
+		<Authors>Jan Král</Authors>
+		<Description>Breakpoints.Avalonia is a library for Avalonia UI (https://avaloniaui.net/) that provides responsive design capabilities using breakpoints. It allows you to define different UI layouts and behaviors based on the size of the application window.</Description>
+		<PackageProjectUrl>https://github.com/AVVI94/Breakpoints.Avalonia</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/AVVI94/Breakpoints.Avalonia</RepositoryUrl>
+		<Version>1.0</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia" Version="11.0.10" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+		<PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
+	</ItemGroup>
+
+</Project>

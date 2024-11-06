@@ -8,9 +8,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia.Responsivity.Breakpoints", "Avalonia.Responsivity.Breakpoints\Avalonia.Responsivity.Breakpoints.csproj", "{D444E0FE-960B-4B38-9ED8-5740DAE5A2CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Breakpoints.Avalonia", "Breakpoints.Avalonia\Breakpoints.Avalonia.csproj", "{D444E0FE-960B-4B38-9ED8-5740DAE5A2CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Avalonia.Responsivity.Breakpoints.TestApp", "Avalonia.Responsivity.Breakpoints.TestApp\Avalonia.Responsivity.Breakpoints.TestApp.csproj", "{D74723CE-B5C8-4845-A8A5-54E50FEBA4BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Breakpoints.Avalonia.TestApp", "Breakpoints.Avalonia.TestApp\Breakpoints.Avalonia.TestApp.csproj", "{D74723CE-B5C8-4845-A8A5-54E50FEBA4BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

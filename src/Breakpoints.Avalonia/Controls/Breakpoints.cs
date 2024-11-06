@@ -3,14 +3,14 @@ using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.LogicalTree;
 using Avalonia.Reactive;
-using Avalonia.Responsivity.Breakpoints.Collections;
+using Breakpoints.Avalonia.Collections;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 
-namespace Avalonia.Responsivity.Breakpoints.Controls;
+namespace Breakpoints.Avalonia.Controls;
 
 public class Breakpoints
 {

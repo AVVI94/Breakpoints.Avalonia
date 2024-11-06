@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Avalonia.Responsivity.Breakpoints.Collections;
+namespace Breakpoints.Avalonia.Collections;
 
 using System;
 using System.Collections;

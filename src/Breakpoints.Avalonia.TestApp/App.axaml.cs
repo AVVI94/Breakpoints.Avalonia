@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
-namespace Avalonia.Responsivity.Breakpoints.TestApp
+namespace Breakpoints.Avalonia.TestApp
 {
     public partial class App : Application
     {

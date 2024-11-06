@@ -1,7 +1,7 @@
 using Avalonia.Controls;
-using Avalonia.Responsivity.Breakpoints.Collections;
+using Breakpoints.Avalonia.Collections;
 
-namespace Avalonia.Responsivity.Breakpoints.TestApp
+namespace Breakpoints.Avalonia.TestApp
 {
     public partial class MainWindow : Window
     {

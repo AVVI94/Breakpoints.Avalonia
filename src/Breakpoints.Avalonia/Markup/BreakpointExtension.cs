@@ -3,14 +3,15 @@ using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Avalonia.Responsivity.Breakpoints.Controls;
+using Breakpoints.Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Logging;
 using Avalonia.Threading;
 using System.Threading;
 using Avalonia.Controls;
+using Avalonia;
 
-namespace Avalonia.Responsivity.Breakpoints.Markup;
+namespace Breakpoints.Avalonia.Markup;
 
 public class BreakpointExtension : MarkupExtension
 {
@@ -41,7 +42,7 @@ public class BreakpointExtension : MarkupExtension
             ?? throw new InvalidOperationException("The target property is not an AvaloniaProperty.");
 
         if (target.TargetObject is not Visual visual
-            || !Breakpoints.Controls.Breakpoints.TryFindBreakpointProvider(visual, out var bpProv))
+            || !Controls.Breakpoints.TryFindBreakpointProvider(visual, out var bpProv))
             return AvaloniaProperty.UnsetValue;
 
         string previousBreakpoint = "";

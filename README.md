@@ -2,7 +2,7 @@
 
 [![Nuget](https://img.shields.io/nuget/v/Breakpoints.Avalonia)](https://www.nuget.org/packages/Breakpoints.Avalonia) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/AVVI94/Breakpoints.Avalonia/master/LICENSE)
 
-`Breakpoints.Avalonia` is a library for [Avalonia UI](https://avaloniaui.net/) that provides responsive design capabilities using breakpoints. It allows you to define different UI layouts and behaviors based on the size of the application window.
+`Breakpoints.Avalonia` is a library for [Avalonia UI](https://avaloniaui.net/) that provides responsive design capabilities using breakpoints. It allows you to define different UI layouts and behaviors based on the size of the application window (or any other element!).
 
 ![](gif.gif)
 

@@ -1,11 +1,12 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:a="https://github.com/AVVI94"
              x:Class="Breakpoints.Avalonia.TestApp.App"
              RequestedThemeVariant="Default">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Styles>
         <FluentTheme />
-		<ResponsivityBreakpoints />
+		<a:ResponsivityBreakpoints />
     </Application.Styles>	
 </Application>

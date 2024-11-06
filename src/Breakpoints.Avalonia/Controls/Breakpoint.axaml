@@ -1,6 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:c="using:Breakpoints.Avalonia.Controls">
+					xmlns:c="using:AVVI94.Breakpoints.Avalonia.Controls">
     <ControlTheme x:Key="{x:Type c:Breakpoint}"
                   TargetType="c:Breakpoint">
         <Setter Property="Template">

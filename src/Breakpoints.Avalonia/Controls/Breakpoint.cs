@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Breakpoints.Avalonia.Controls;
+namespace AVVI94.Breakpoints.Avalonia.Controls;
 
 public class Breakpoint : ContentControl
 {
@@ -55,7 +55,7 @@ public class Breakpoint : ContentControl
     /// </summary>
     public string? UpperBound
     {
-        get => this.GetValue(UpperBoundProperty);
+        get => GetValue(UpperBoundProperty);
         set => SetValue(UpperBoundProperty, value);
     }
 
@@ -95,7 +95,7 @@ public class Breakpoint : ContentControl
         Debug.Assert(_breakpointProvider is not null);
 
         _breakpointProvider!.PropertyChanged += OnParentPropertyChanged;
-        this.PropertyChanged += Breakpoint_PropertyChanged;
+        PropertyChanged += Breakpoint_PropertyChanged;
     }
 
     private void Breakpoint_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)

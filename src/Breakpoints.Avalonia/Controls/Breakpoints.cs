@@ -3,14 +3,14 @@ using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.LogicalTree;
 using Avalonia.Reactive;
-using Breakpoints.Avalonia.Collections;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using AVVI94.Breakpoints.Avalonia.Collections;
 
-namespace Breakpoints.Avalonia.Controls;
+namespace AVVI94.Breakpoints.Avalonia.Controls;
 
 public class Breakpoints
 {
@@ -74,7 +74,7 @@ public class Breakpoints
                     SetCurrentBreakpoint(element, next.Key);
                     return;
                 }
-            }            
+            }
         };
 
     }
@@ -204,7 +204,7 @@ public class Breakpoints
             return true;
         }
 
-        if(width <= value)
+        if (width <= value)
         {
             return false;
         }

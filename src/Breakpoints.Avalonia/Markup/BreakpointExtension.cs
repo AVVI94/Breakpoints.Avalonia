@@ -1,17 +1,14 @@
-﻿using Avalonia.Data.Converters;
-using Avalonia.Markup.Xaml;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Breakpoints.Avalonia.Controls;
-using Avalonia.Data;
-using Avalonia.Logging;
-using Avalonia.Threading;
-using System.Threading;
+﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia;
+using Avalonia.Data;
+using Avalonia.Data.Converters;
+using Avalonia.Logging;
+using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
+using System;
+using System.Threading;
 
-namespace Breakpoints.Avalonia.Markup;
+namespace AVVI94.Breakpoints.Avalonia.Markup;
 
 public class BreakpointExtension : MarkupExtension
 {

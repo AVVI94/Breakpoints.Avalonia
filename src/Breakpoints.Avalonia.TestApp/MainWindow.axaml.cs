@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Breakpoints.Avalonia.Collections;
+using AVVI94.Breakpoints.Avalonia.Collections;
 
 namespace Breakpoints.Avalonia.TestApp
 {
@@ -15,7 +15,7 @@ namespace Breakpoints.Avalonia.TestApp
                 ("L", 1200),
                 ("XXL", 1600)
             ];
-            Controls.Breakpoints.SetValues(this, bp);
+            AVVI94.Breakpoints.Avalonia.Controls.Breakpoints.SetValues(this, bp);
         }
     }
 }

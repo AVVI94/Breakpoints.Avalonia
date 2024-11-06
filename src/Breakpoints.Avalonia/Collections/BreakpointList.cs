@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Breakpoints.Avalonia.Collections;
+namespace AVVI94.Breakpoints.Avalonia.Collections;
 
 using System;
 using System.Collections;

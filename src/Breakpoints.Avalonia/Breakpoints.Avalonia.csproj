@@ -11,9 +11,9 @@
 		<PackageProjectUrl>https://github.com/AVVI94/Breakpoints.Avalonia</PackageProjectUrl>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/AVVI94/Breakpoints.Avalonia</RepositoryUrl>
-		<Version>1.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
+		<RootNamespace>AVVI94.Breakpoints.Avalonia</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>

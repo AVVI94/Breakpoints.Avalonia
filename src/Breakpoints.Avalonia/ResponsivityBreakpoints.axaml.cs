@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Breakpoints.Avalonia;
+namespace AVVI94.Breakpoints.Avalonia;
 
 public class ResponsivityBreakpoints : Styles
 {

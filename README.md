@@ -26,7 +26,7 @@
 NuGet package:
 
 ```
-
+dotnet add package Breakpoints.Avalonia
 ```
 
 [Link](https://www.nuget.org/packages/Breakpoints.Avalonia)

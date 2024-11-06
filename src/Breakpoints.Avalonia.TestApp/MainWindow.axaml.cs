@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using AVVI94.Breakpoints.Avalonia.Collections;
+using System.Diagnostics;
 
 namespace Breakpoints.Avalonia.TestApp
 {

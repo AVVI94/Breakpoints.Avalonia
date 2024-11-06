@@ -67,6 +67,10 @@ public class Breakpoints
             if (e.Property.Name == nameof(element.Width))
             {
                 var vals = GetValues(element);
+                if(vals is null)
+                {
+                    return;
+                }
                 if (vals.FindPrevious((double)e.NewValue!) is KeyValuePair<string, double> current)
                 {
                     SetCurrentBreakpoint(element, current.Key);

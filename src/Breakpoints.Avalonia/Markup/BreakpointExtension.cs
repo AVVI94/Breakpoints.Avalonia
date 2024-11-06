@@ -71,6 +71,8 @@ public class BreakpointExtension : MarkupExtension
     /// </summary>
     public object? ConverterParameter { get; set; }
 
+    object? previousValue = AvaloniaProperty.UnsetValue;
+    string previousBreakpoint = "";
 
     /// <inheritdoc/>
     public override object ProvideValue(IServiceProvider serviceProvider)
@@ -79,7 +81,12 @@ public class BreakpointExtension : MarkupExtension
         var targetProperty = target.TargetProperty as AvaloniaProperty;
         var targetType = (targetProperty?.PropertyType)
             ?? throw new InvalidOperationException("The target property is not an AvaloniaProperty.");
-        
+
+        if (Design.IsDesignMode)
+        {
+            return ConvertValue(targetType, XXL ?? XL ?? L ?? M ?? S ?? XS ?? Default!)!;
+        }
+
         if (target.TargetObject is not Visual visual
             || !Controls.Breakpoints.TryFindBreakpointProvider(visual, out var bpProv))
         {
@@ -101,9 +108,6 @@ public class BreakpointExtension : MarkupExtension
         }
 
     BindingSetup:
-        string previousBreakpoint = "";
-        object? previousValue = AvaloniaProperty.UnsetValue;
-
         return new Binding("Width", BindingMode.OneWay)
         {
             Source = bpProv,
@@ -141,44 +145,48 @@ public class BreakpointExtension : MarkupExtension
                     : AvaloniaProperty.UnsetValue;
                 }
 
-
-                object? v;
-                if (targetType == typeof(double))
-                {
-                    _ = double.TryParse(value as string ?? value.ToString(), out var d) ? v = d : v = 0;
-                }
-                else if (targetType == typeof(int))
-                {
-                    _ = int.TryParse(value as string ?? value.ToString(), out var i) ? v = i : v = 0;
-                }
-                else if (targetType == typeof(float))
-                {
-                    _ = float.TryParse(value as string ?? value.ToString(), out var f) ? v = f : v = 0;
-                }
-                else if (targetType == typeof(bool))
-                {
-                    _ = bool.TryParse(value as string ?? value.ToString(), out var b) ? v = b : v = false;
-                }
-                else if (targetType == typeof(GridLength))
-                {
-                    v = GridLength.Parse(value as string ?? value.ToString() ?? "*");
-                }
-                else if (targetType.IsEnum)
-                {
-                    v = Enum.Parse(targetType, value as string ?? value.ToString());
-                }
-                else
-                {
-                    v = value;
-                }
-
-
-                return previousValue = Converter is not null ? Converter?.Convert(v,
-                                                                                  targetType,
-                                                                                  ConverterParameter,
-                                                                                  Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))
-                : v;
+                return ConvertValue(targetType, value);
             })
         };
+    }
+
+    private object? ConvertValue(Type targetType, object value)
+    {
+        object? v;
+        if (targetType == typeof(double))
+        {
+            _ = double.TryParse(value as string ?? value.ToString(), out var d) ? v = d : v = 0;
+        }
+        else if (targetType == typeof(int))
+        {
+            _ = int.TryParse(value as string ?? value.ToString(), out var i) ? v = i : v = 0;
+        }
+        else if (targetType == typeof(float))
+        {
+            _ = float.TryParse(value as string ?? value.ToString(), out var f) ? v = f : v = 0;
+        }
+        else if (targetType == typeof(bool))
+        {
+            _ = bool.TryParse(value as string ?? value.ToString(), out var b) ? v = b : v = false;
+        }
+        else if (targetType == typeof(GridLength))
+        {
+            v = GridLength.Parse(value as string ?? value.ToString() ?? "*");
+        }
+        else if (targetType.IsEnum)
+        {
+            v = Enum.Parse(targetType, value as string ?? value.ToString());
+        }
+        else
+        {
+            v = value;
+        }
+
+
+        return previousValue = Converter is not null ? Converter?.Convert(v,
+                                                                          targetType,
+                                                                          ConverterParameter,
+                                                                          Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))
+        : v;
     }
 }

@@ -212,3 +212,7 @@ The markup extension implementation does not support upper bounds or exclusive b
     <Rectangle Height="50" Fill="Blue" Grid.Column="2" />
 </Grid>
 ```
+
+## License
+
+[MIT](https://github.com/AVVI94/Breakpoints.Avalonia/blob/master/LICENSE)

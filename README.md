@@ -37,7 +37,12 @@ dotnet add package Breakpoints.Avalonia
 
 ## Setup
 
-I tried to make using this library as simple as possible, including merging my namespaces with Avalonia namespaces in a separate nuget package. Thanks to this (dirty) solution, you don't have to specify a custom XML namespace (xmlns) and you can use breakpoints directly. This documentation however uses the traditional way of specifying the namespace.
+I tried to make using this library as simple as possible. All you have to do is the following:
+
+1) [Setup App.xaml](#appxaml)
+2) [Define and set breakpoints](#defining-breakpoints-and-breakpoint-providers)
+3) [Define breakpoints provider](#defining-breakpoints-and-breakpoint-providers)
+4) [Use them](#using-breakpoints)
 
 ### App.xaml
 

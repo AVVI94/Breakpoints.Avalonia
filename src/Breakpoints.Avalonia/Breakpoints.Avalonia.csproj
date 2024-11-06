@@ -14,6 +14,7 @@
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
 		<RootNamespace>AVVI94.Breakpoints.Avalonia</RootNamespace>
+		<AssemblyName>$(RootNamespace)</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

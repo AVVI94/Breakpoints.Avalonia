@@ -1,6 +1,6 @@
 # Breakpoints.Avalonia
 
-[![Nuget](https://img.shields.io/nuget/v/Breakpoints.Avalonia)](https://www.nuget.org/packages/Breakpoints.Avalonia) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/AVVI94/Breakpoints.Avalonia/master/LICENSE)
+[![Nuget](https://img.shields.io/nuget/v/AVVI94.Breakpoints.Avalonia)](https://www.nuget.org/packages/AVVI94.Breakpoints.Avalonia) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/AVVI94/Breakpoints.Avalonia/master/LICENSE)
 
 `Breakpoints.Avalonia` is a library for [Avalonia UI](https://avaloniaui.net/) that provides responsive design capabilities using breakpoints. It allows you to define different UI layouts and behaviors based on the size of the application window (or any other element!).
 
@@ -35,19 +35,40 @@ dotnet add package Breakpoints.Avalonia
 
 ## Setup
 
-I tried to make using this library as simple as possible, including merging my namespaces with Avalonia namespaces. Thanks to this (dirty) solution, you don't have to specify a custom XML namespace (xmlns) and you can use breakpoints directly.
+I tried to make using this library as simple as possible, including merging my namespaces with Avalonia namespaces in a separate nuget package. Thanks to this (dirty) solution, you don't have to specify a custom XML namespace (xmlns) and you can use breakpoints directly. This documentation however uses the traditional way of specifying the namespace.
 
 ### App.xaml
 
-In your `App.axaml` file, add the `ResponsivityBreakpoints` resource:
+In your `App.axaml` file, define namespace and add the `ResponsivityBreakpoints` resource:
 
+(If you also reference the AVVI94.Breakpoints.Avalonia.Xmlns package, you can omit the xaml namespace definition)
 
+```xml
+xmlns:avvi="using:AVVI94.Breakpoints.Avalonia"
+```
 
 ```xml
 <Application.Styles>
     <FluentTheme />
-    <ResponsivityBreakpoints />
+	<avvi:ResponsivityBreakpoints />
 </Application.Styles>	
+```
+
+Full `App.axaml` example:
+
+```xml
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:avvi="https://github.com/AVVI94"
+             x:Class="Breakpoints.Avalonia.TestApp.App"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Styles>
+        <FluentTheme />
+		<avvi:ResponsivityBreakpoints />
+    </Application.Styles>	
+</Application>
 ```
 
 ### Defining breakpoints and breakpoint providers
@@ -58,7 +79,7 @@ The logical tree is searched upwards from the element that requested the breakpo
 
 #### Set up breakpoints
 
-To set up the breakpoint values, create a new instance of `Breakpoints.Avalonia.Collections.BreakpointList` and add your desired breakpoint values:
+To set up the breakpoint values, create a new instance of `AVVI94.Breakpoints.Avalonia.Collections.BreakpointList` and add your desired breakpoint values:
 
 ```cs
 BreakpointList bp = [
@@ -74,14 +95,14 @@ Then get the element you want to provide the breakpoints and set `Breakpoints.Va
 
 ```cs
 var provider = (MainWindow)this;
-Breakpoints.Avalonia.Controls.Breakpoints.SetValues(provider, bp);
+AVVI94.Breakpoints.Avalonia.Controls.Breakpoints.SetValues(provider, bp);
 ```
 
 Full MainWindow code-behind:
 
 ```cs
 using Avalonia.Controls;
-using Breakpoints.Avalonia.Collections;
+using AVVI94.Breakpoints.Avalonia.Collections;
 
 namespace Breakpoints.Avalonia.TestApp
 {
@@ -90,6 +111,8 @@ namespace Breakpoints.Avalonia.TestApp
         public MainWindow()
         {
             InitializeComponent();
+            // Here you can also add your custom breakpoints that can be used with
+            // the Breakpoint control
             BreakpointList bp = [
                 ("XS", 600),
                 ("S", 800),
@@ -117,12 +140,13 @@ If you choose to use MainWindow as a provider, your XAML could look like this:
 <Window x:Class="Breakpoints.Avalonia.TestApp.MainWindow"
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:avvi="https://github.com/AVVI94"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Breakpoints.Avalonia.TestApp"
         d:DesignHeight="450"
         d:DesignWidth="800"
-        Breakpoints.IsBreakpointProvider="true"
+        avvi:Breakpoints.IsBreakpointProvider="true"
         mc:Ignorable="d">
     ...
 </Window>
@@ -137,11 +161,11 @@ You have two options for using breakpoints.
 You can use the `Breakpoint` custom control, which hides itself when the breakpoint gets hit. This control works similarly to Panel controls:
 
 ```xml
-<Breakpoint For=S>
+<avvi:Breakpoint For=S>
     <Grid>
         ...
     </Grid>
-</Breakpoint>
+</avvi:Breakpoint>
 ```
 
 Control parameters:
@@ -156,7 +180,7 @@ Control parameters:
 You can also use the markup extension with predefined breakpoint names (not values, just names). This extension usage is similar to the official OnPlatform extension. Names of the breakpoints in the BreakpointList must match properties of the Breakpoint markup extension class (Default property is excluded).
 
 ```XML
- <StackPanel Orientation="{Breakpoint Vertical, M=Horizontal}">
+ <StackPanel Orientation="{avvi:Breakpoint Vertical, M=Horizontal}">
      <Button Content="Button" />
      <Button Content="Button" />
      <Button Content="Button" />

@@ -7,6 +7,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using System;
 using System.Threading;
+using Avalonia.LogicalTree;
+using Avalonia.Markup.Xaml.XamlIl.Runtime;
+using System.Linq;
 
 namespace AVVI94.Breakpoints.Avalonia.Markup;
 
@@ -37,11 +40,28 @@ public class BreakpointExtension : MarkupExtension
         var targetProperty = target.TargetProperty as AvaloniaProperty;
         var targetType = (targetProperty?.PropertyType)
             ?? throw new InvalidOperationException("The target property is not an AvaloniaProperty.");
-
+        
         if (target.TargetObject is not Visual visual
             || !Controls.Breakpoints.TryFindBreakpointProvider(visual, out var bpProv))
+        {
+            // If the target object is not a Visual, to find first parent Visual that is a BreakpointProvider
+            // If this fails I have no idea what to do, so I return UnsetValue
+            var parents = (IAvaloniaXamlIlParentStackProvider)serviceProvider.GetService(typeof(IAvaloniaXamlIlParentStackProvider))!;
+            if (parents.Parents.Any())
+            {
+                foreach (var p in parents.Parents)
+                {
+                    if (p is Visual v && Controls.Breakpoints.TryFindBreakpointProvider(v, out bpProv))
+                    {
+                        visual = v;
+                        goto BindingSetup;
+                    }
+                }
+            }
             return AvaloniaProperty.UnsetValue;
+        }
 
+    BindingSetup:
         string previousBreakpoint = "";
         object? previousValue = AvaloniaProperty.UnsetValue;
 

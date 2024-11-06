@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Authors>Jan Král</Authors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Authors>Jan Král</Authors>
+		<AssemblyName>AVVI94.$(RootNamespace)</AssemblyName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Breakpoints.Avalonia\Breakpoints.Avalonia.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Breakpoints.Avalonia\Breakpoints.Avalonia.csproj" />
+	</ItemGroup>
 
 </Project>

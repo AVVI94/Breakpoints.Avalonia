@@ -4,6 +4,8 @@
 
 `Breakpoints.Avalonia` is a library for [Avalonia UI](https://avaloniaui.net/) that provides responsive design capabilities using breakpoints. It allows you to define different UI layouts and behaviors based on the size of the application window.
 
+![](gif.gif)
+
 ## Table of Contents
 
 - [Features](#features)

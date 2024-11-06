@@ -197,3 +197,18 @@ You can specify a default value that will be used when no other smaller breakpoi
 This markup extension also supports Converters (IValueConverter). It may also support bindings for values, although this has not been tested.
 
 The markup extension implementation does not support upper bounds or exclusive breakpoints.
+
+#### Fixed grid columns for different breakpoints
+
+```XML
+<Grid>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+    </Grid.ColumnDefinitions>
+    <Rectangle Height="50" Fill="Red" Grid.Column="0" />
+    <Rectangle MinWidth="50" Height="50" Fill="Green" Grid.Column="1" />
+    <Rectangle Height="50" Fill="Blue" Grid.Column="2" />
+</Grid>
+```

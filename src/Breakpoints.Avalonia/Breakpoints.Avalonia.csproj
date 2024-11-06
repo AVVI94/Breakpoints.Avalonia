@@ -13,6 +13,7 @@
 		<RepositoryUrl>https://github.com/AVVI94/Breakpoints.Avalonia</RepositoryUrl>
 		<Version>1.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<AssemblyOriginatorKeyFile>..\key.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -12,6 +12,9 @@ using System.Text;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
+/// <summary>
+/// A control that can be used to hide or show content based on the current breakpoint.
+/// </summary>
 public class Breakpoint : ContentControl
 {
     /// <summary>
@@ -76,6 +79,7 @@ public class Breakpoint : ContentControl
 
     Layoutable? _breakpointProvider;
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);

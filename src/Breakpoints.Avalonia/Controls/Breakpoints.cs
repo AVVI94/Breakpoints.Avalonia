@@ -12,6 +12,9 @@ using AVVI94.Breakpoints.Avalonia.Collections;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
+/// <summary>
+/// Breakpoints AttachedProperty definition and helper methods.
+/// </summary>
 public class Breakpoints
 {
     /// <summary>
@@ -109,6 +112,18 @@ public class Breakpoints
     public static string GetCurrentBreakpoint(Layoutable element) =>
         element.GetValue(CurrentBreakpointProperty);
 
+    /// <summary>
+    /// Try to find the breakpoint provider of the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// The element to find the breakpoint provider for.
+    /// </param>
+    /// <param name="provider">
+    /// The breakpoint provider of the specified element.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the breakpoint provider was found, otherwise <see langword="false"/>.
+    /// </returns>
     public static bool TryFindBreakpointProvider(Visual? element, out Layoutable? provider)
     {
         if (element is null)
@@ -139,6 +154,21 @@ public class Breakpoints
         return true;
     }
 
+    /// <summary>
+    /// Try to find the breakpoints of the specified element.
+    /// </summary>
+    /// <param name="element">
+    /// The element to find the breakpoints for.
+    /// </param>
+    /// <param name="breakpoints">
+    /// The breakpoints of the specified element.
+    /// </param>
+    /// <param name="provider">
+    /// [OUT] The breakpoint provider of the specified element.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the breakpoints were found, otherwise <see langword="false"/>.
+    /// </returns>
     public static bool TryFindBreakpoints(Visual? element, out BreakpointList? breakpoints, out Layoutable? provider)
     {
         if (element is null)
@@ -186,6 +216,21 @@ public class Breakpoints
         return true;
     }
 
+    /// <summary>
+    /// Check if the element should be visible at the specified breakpoint.
+    /// </summary>
+    /// <param name="element">
+    /// The element to check the visibility for.
+    /// </param>
+    /// <param name="breakpoint">
+    /// The breakpoint to check the visibility for.
+    /// </param>
+    /// <param name="exclusive">
+    /// If <see langword="true"/> the element should be visible only at the specified breakpoint.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the element should be visible, otherwise <see langword="false"/>.
+    /// </returns>
     public static bool ShouldBeVisible(Visual element, string breakpoint, bool exclusive = false)
     {
         if (!TryFindBreakpoints(element, out var breakpoints, out var provider))
@@ -221,6 +266,21 @@ public class Breakpoints
         return true;
     }
 
+    /// <summary>
+    /// Check if the element should be visible between the specified breakpoints.
+    /// </summary>
+    /// <param name="element">
+    /// The element to check the visibility for.
+    /// </param>
+    /// <param name="lower">
+    /// The lower breakpoint.
+    /// </param>
+    /// <param name="upper">
+    /// The upper breakpoint.
+    /// </param>
+    /// <returns>
+    /// <see langword="true"/> if the element should be visible, otherwise <see langword="false"/>.
+    /// </returns>
     public static bool IsBetween(Visual element, string lower, string upper)
     {
         if (!TryFindBreakpoints(element, out var breakpoints, out var provider))

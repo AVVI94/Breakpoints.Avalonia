@@ -13,27 +13,66 @@ using System.Linq;
 
 namespace AVVI94.Breakpoints.Avalonia.Markup;
 
+/// <summary>
+/// Markup extension to provide values based on the current breakpoint
+/// </summary>
 public class BreakpointExtension : MarkupExtension
 {
+    /// <summary>
+    /// Create a new instance of BreakpointExtension
+    /// </summary>
+    /// <param name="def">Smalles possible default value</param>
     public BreakpointExtension(object def)
     {
         Default = def;
     }
+    /// <summary>
+    /// Create a new instance of BreakpointExtension
+    /// </summary>
     public BreakpointExtension()
     {
     }
 
+    /// <summary>
+    /// Value for breakpoint XS
+    /// </summary>
     public object? XS { get; set; }
+    /// <summary>
+    /// Value for breakpoint S
+    /// </summary>
     public object? S { get; set; }
+    /// <summary>
+    /// Value for breakpoint M
+    /// </summary>
     public object? M { get; set; }
+    /// <summary>
+    /// Value for breakpoint L
+    /// </summary>
     public object? L { get; set; }
+    /// <summary>
+    /// Value for breakpoint XL
+    /// </summary>
     public object? XL { get; set; }
+    /// <summary>
+    /// Value for breakpoint XXL
+    /// </summary>
     public object? XXL { get; set; }
+    /// <summary>
+    /// Smalles possible value when no other breakpoint is defined
+    /// </summary>
     public object? Default { get; set; }
 
+    /// <summary>
+    /// Value converter
+    /// </summary>
     public IValueConverter? Converter { get; set; }
+    /// <summary>
+    /// Value converter parameter
+    /// </summary>
     public object? ConverterParameter { get; set; }
 
+
+    /// <inheritdoc/>
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
         var target = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget))!;

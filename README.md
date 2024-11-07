@@ -34,7 +34,7 @@ NuGet package:
 dotnet add package AVVI94.Breakpoints.Avalonia
 ```
 
-[Link]([https://www.nuget.org/packages/Breakpoints.Avalonia](https://www.nuget.org/packages/AVVI94.Breakpoints.Avalonia/))
+[Link](https://www.nuget.org/packages/AVVI94.Breakpoints.Avalonia)
 
 ## Setup
 

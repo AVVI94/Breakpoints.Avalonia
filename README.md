@@ -31,10 +31,10 @@ The package should be compatible with Avalonia >= 11.0.10.
 NuGet package:
 
 ```
-dotnet add package Breakpoints.Avalonia
+dotnet add package AVVI94.Breakpoints.Avalonia
 ```
 
-[Link](https://www.nuget.org/packages/Breakpoints.Avalonia)
+[Link]([https://www.nuget.org/packages/Breakpoints.Avalonia](https://www.nuget.org/packages/AVVI94.Breakpoints.Avalonia/))
 
 ## Setup
 

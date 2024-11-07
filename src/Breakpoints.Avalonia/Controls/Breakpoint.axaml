@@ -3,6 +3,8 @@
 					xmlns:c="using:AVVI94.Breakpoints.Avalonia.Controls">
     <ControlTheme x:Key="{x:Type c:Breakpoint}"
                   TargetType="c:Breakpoint">
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="Template">
             <ControlTemplate>
                 <ContentPresenter Content="{TemplateBinding Content}"

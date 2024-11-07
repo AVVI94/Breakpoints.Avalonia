@@ -266,9 +266,15 @@ public class Breakpoints
                 break;
             }
         }
-        Debug.Assert(parentV is Layoutable);
-
-        Layoutable parent = (Layoutable)parentV!;
+        //Debug.Assert(parentV is Layoutable);
+        if (parentV is not Layoutable parent)
+        {
+            Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "No breakpoint provider found.");
+            breakpoints = null;
+            provider = null;
+            return false;
+        }
+        
         if (parent is null)
         {
             Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "No breakpoint provider found.");

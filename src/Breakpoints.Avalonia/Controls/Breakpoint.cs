@@ -127,7 +127,7 @@ public class Breakpoint : ContentControl, IObserver<object?>
     {
         if (!Enabled)
         {
-            IsVisible = true;
+            IsVisible = false;
             InvalidateVisual();
             return;
         }

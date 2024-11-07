@@ -52,7 +52,12 @@
         </a:Breakpoint>
 
         <TextBlock Margin="20"
-                   Text="{a:Breakpoint XS='Extra small'                                 S='Small',             M='Medium',                        L='Large',                                         XXL='Extra extra large'}" />
+                   Text="{a:Breakpoint XS='Extra small'         
+				   S='Small',             
+				   M='Medium',                        
+				   L='Large',                                         
+				   XL='Extra Large',                                         
+				   XXL='Extra extra large'}" />
 
         <StackPanel Orientation="{a:Breakpoint Vertical, M=Horizontal}">
             <Button Content="Button" />
@@ -62,16 +67,25 @@
             <Button Content="Button" />
             <Button Content="Button" />
         </StackPanel>
-		<TextBox AcceptsReturn="True" x:Name="GridInfoTextBox" IsReadOnly="True" />
-		<Grid>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
-			</Grid.ColumnDefinitions>
-			<Rectangle Height="50" Fill="Red" Grid.Column="0" />
-			<Rectangle MinWidth="50" Height="50" Fill="Green" Grid.Column="1" />
-			<Rectangle Height="50" Fill="Blue" Grid.Column="2" />
-		</Grid>
+        <TextBox x:Name="GridInfoTextBox"
+                 AcceptsReturn="True"
+                 IsReadOnly="True" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+            </Grid.ColumnDefinitions>
+            <Rectangle Grid.Column="0"
+                       Height="50"
+                       Fill="Red" />
+            <Rectangle Grid.Column="1"
+                       Height="50"
+                       MinWidth="50"
+                       Fill="Green" />
+            <Rectangle Grid.Column="2"
+                       Height="50"
+                       Fill="Blue" />
+        </Grid>
     </StackPanel>
 </Window>

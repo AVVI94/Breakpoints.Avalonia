@@ -14,6 +14,7 @@ namespace Breakpoints.Avalonia.TestApp
                 ("S", 800),
                 ("M", 1000),
                 ("L", 1200),
+                ("XL", 1400),
                 ("XXL", 1600)
             ];
             AVVI94.Breakpoints.Avalonia.Controls.Breakpoints.SetValues(this, bp);

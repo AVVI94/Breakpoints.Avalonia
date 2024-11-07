@@ -15,7 +15,7 @@ namespace AVVI94.Breakpoints.Avalonia.Controls;
 /// <summary>
 /// A control that can be used to hide or show content based on the current breakpoint.
 /// </summary>
-public class Breakpoint : ContentControl
+public class Breakpoint : ContentControl, IObserver<object?>
 {
     /// <summary>
     /// Enabled StyledProperty definition
@@ -78,6 +78,7 @@ public class Breakpoint : ContentControl
     }
 
     Layoutable? _breakpointProvider;
+    IDisposable? _bindingDisposable;
 
     /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -98,29 +99,31 @@ public class Breakpoint : ContentControl
 
         Debug.Assert(_breakpointProvider is not null);
 
-        _breakpointProvider!.PropertyChanged += OnParentPropertyChanged;
+        var binding = Controls.Breakpoints.CurrentBreakpointProperty.Bind().WithMode(BindingMode.OneWay);
+        binding.Source = _breakpointProvider;
+        _bindingDisposable = binding.Subscribe(this);
+
         PropertyChanged += Breakpoint_PropertyChanged;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        PropertyChanged -= Breakpoint_PropertyChanged;
+        _bindingDisposable?.Dispose();
+        _bindingDisposable = null;
     }
 
     private void Breakpoint_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property.Name == nameof(Enabled))
         {
-            UpdateBreakpoint(Width);
+            UpdateBreakpoint();
         }
     }
 
-    private void OnParentPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
-    {
-        if (e.Property.Name != nameof(Width))
-        {
-            return;
-        }
-
-        UpdateBreakpoint((double)e.NewValue!);
-    }
-
-    private void UpdateBreakpoint(double width)
+    private void UpdateBreakpoint()
     {
         if (!Enabled)
         {
@@ -134,5 +137,24 @@ public class Breakpoint : ContentControl
             return;
         }
         IsVisible = Breakpoints.ShouldBeVisible(this, For, IsExclusive);
+    }
+
+    /// <inheritdoc/>
+    public void OnCompleted()
+    {
+        _bindingDisposable?.Dispose();
+        _bindingDisposable = null;
+    }
+
+    /// <inheritdoc/>
+    public void OnError(Exception error)
+    {
+        Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(this, "Error during breakpoint subscription. {Error}", error);
+    }
+
+    /// <inheritdoc/>
+    public void OnNext(object? value)
+    {
+        UpdateBreakpoint();
     }
 }

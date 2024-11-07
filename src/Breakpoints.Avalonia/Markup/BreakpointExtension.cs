@@ -4,12 +4,11 @@ using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
+using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using Avalonia.Threading;
 using System;
-using System.Threading;
-using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using System.Linq;
+using System.Threading;
 
 namespace AVVI94.Breakpoints.Avalonia.Markup;
 
@@ -71,8 +70,8 @@ public class BreakpointExtension : MarkupExtension
     /// </summary>
     public object? ConverterParameter { get; set; }
 
-    object? previousValue = AvaloniaProperty.UnsetValue;
-    string previousBreakpoint = "";
+    object? _previousValue = AvaloniaProperty.UnsetValue;
+    string _previousBreakpoint = "";
 
     /// <inheritdoc/>
     public override object ProvideValue(IServiceProvider serviceProvider)
@@ -108,13 +107,22 @@ public class BreakpointExtension : MarkupExtension
         }
 
     BindingSetup:
-        return new Binding("Width", BindingMode.OneWay)
+        var valuesBinding = Controls.Breakpoints.ValuesProperty.Bind();
+        valuesBinding.Source = bpProv;
+        var currentBpBinding = Controls.Breakpoints.CurrentBreakpointProperty.Bind();
+        currentBpBinding.Source = bpProv;
+        return new MultiBinding()
         {
-            Source = bpProv,
-            Converter = new FuncValueConverter<double, object?>(w =>
+            Bindings =
+            {
+                valuesBinding.ToBinding(),
+                currentBpBinding.ToBinding(),
+                new Binding("Width") { Source = bpProv }
+            },
+            Converter = new FuncMultiValueConverter<object, object?>(w =>
             {
                 var prov = bpProv!;
-                var bps = Controls.Breakpoints.GetValues(prov);
+                var bps = Controls.Breakpoints.GetValuesActual(prov);
                 var current = Controls.Breakpoints.GetCurrentBreakpoint(prov);
                 if (!(bps?.Items.ContainsKey(current) ?? false))
                 {
@@ -122,9 +130,9 @@ public class BreakpointExtension : MarkupExtension
                     return AvaloniaProperty.UnsetValue;
                 }
 
-                if (current == previousBreakpoint)
-                    return previousValue;
-                previousBreakpoint = current;
+                if (current == _previousBreakpoint)
+                    return _previousValue;
+                _previousBreakpoint = current;
                 var value = current switch
                 {
                     "XS" => XS ?? Default,
@@ -138,7 +146,7 @@ public class BreakpointExtension : MarkupExtension
 
                 if (value == AvaloniaProperty.UnsetValue || value is null)
                 {
-                    return previousValue = Converter is not null ? Converter?.Convert(value,
+                    return _previousValue = Converter is not null ? Converter?.Convert(value,
                                                                                       targetType,
                                                                                       ConverterParameter,
                                                                                       Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))
@@ -183,7 +191,7 @@ public class BreakpointExtension : MarkupExtension
         }
 
 
-        return previousValue = Converter is not null ? Converter?.Convert(v,
+        return _previousValue = Converter is not null ? Converter?.Convert(v,
                                                                           targetType,
                                                                           ConverterParameter,
                                                                           Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))

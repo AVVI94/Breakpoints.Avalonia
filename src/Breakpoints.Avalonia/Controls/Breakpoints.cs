@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Text;
 using AVVI94.Breakpoints.Avalonia.Collections;
 using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
@@ -18,6 +19,42 @@ namespace AVVI94.Breakpoints.Avalonia.Controls;
 /// </summary>
 public class Breakpoints
 {
+    static Breakpoints()
+    {
+        ValuesProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<BreakpointList>>(x =>
+        {
+            if (x.Sender is not StyledElement s)
+            {
+                Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(x.Sender, "Breakpoints.Values can only be set on StyledElement.");
+                return;
+            }
+            SetValuesActual(s, x.NewValue.Value);
+        }));
+    }
+
+
+    /// <summary>
+    /// ValuesActual AttachedProperty definition
+    /// indicates the actual breakpoints values.
+    /// </summary>
+    public static readonly AttachedProperty<BreakpointList> ValuesActualProperty =
+        AvaloniaProperty.RegisterAttached<Breakpoints, StyledElement, BreakpointList>("ValuesActual");
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="ValuesActualProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    /// <param name="value">The value to set  <see cref="ValuesActualProperty"/>.</param>
+    internal static void SetValuesActual(StyledElement element, BreakpointList value) =>
+        element.SetValue(ValuesActualProperty, value);
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="ValuesActualProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    public static BreakpointList GetValuesActual(StyledElement element) =>
+        element.GetValue(ValuesActualProperty);
+
     /// <summary>
     /// Breakpoints AttachedProperty definition
     /// indicates the breakpoints dictionary.
@@ -65,19 +102,32 @@ public class Breakpoints
         }
         element.PropertyChanged += (s, e) =>
         {
-            if (e.Property.Name == nameof(element.Width))
+            if (e.Property.Name == nameof(element.Width) && e.NewValue is not null)
+            {
+                UpdateCurrentBreakpoint(element, (double)e.NewValue!);
+            }
+            if (e.Property.Name == nameof(element.Bounds) && e.NewValue is not null)
+            {
+                UpdateCurrentBreakpoint(element, ((Rect)e.NewValue!).Width);
+            }
+
+            static void UpdateCurrentBreakpoint(Layoutable element, double newValue)
             {
                 var vals = GetValues(element);
                 if (vals is null)
                 {
                     return;
                 }
-                if (vals.FindPrevious((double)e.NewValue!) is KeyValuePair<string, double> current)
+                if (vals.FindPrevious(newValue) is KeyValuePair<string, double> current)
                 {
                     SetCurrentBreakpoint(element, current.Key);
                     return;
                 }
-                if (vals.FindNext((double)e.NewValue!) is KeyValuePair<string, double> next)
+                if (GetCurrentBreakpoint(element) is string bp && vals[bp] == newValue && vals.FindPrevious(newValue) is null)
+                {
+                    return;
+                }
+                if (vals.FindNext(newValue) is KeyValuePair<string, double> next)
                 {
                     SetCurrentBreakpoint(element, next.Key);
                     return;
@@ -138,12 +188,22 @@ public class Breakpoints
         }
 
         Visual? parentV = element.GetLogicalParent() as Visual;
-        while ((parentV = parentV?.GetLogicalParent() as Visual) is not null)
+        do
         {
             if (parentV is Layoutable layoutable && GetIsBreakpointProvider(layoutable))
             {
                 break;
             }
+
+        }
+        while ((parentV = parentV?.GetLogicalParent() as Visual) is not null);
+
+
+        if (parentV is null)
+        {
+            Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "No breakpoint provider found.");
+            provider = null;
+            return false;
         }
         Debug.Assert(parentV is Layoutable);
 
@@ -238,37 +298,58 @@ public class Breakpoints
     /// </returns>
     public static bool ShouldBeVisible(Visual element, string breakpoint, bool exclusive = false)
     {
-        if (!TryFindBreakpoints(element, out _, out var provider))
+        if (!TryFindBreakpoints(element, out var bps, out var provider))
         {
             return true;
         }
-        var bps = GetValues(provider!);
         if (!bps.TryGetValue(breakpoint, out var value))
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(element, "Breakpoint value for '{For}' not found at breakpoint provider {Provider}.", breakpoint, provider);
             return true;
         }
-        var width = provider!.Bounds.Width;
-        if (width <= value && bps.FindPrevious(width) is null && bps.FindPrevious(value) is null)
+
+        var current = GetCurrentBreakpoint(provider);
+        if (current == breakpoint || current is null)
         {
             return true;
         }
 
-        if (width <= value)
-        {
-            return false;
-        }
+        //if(value < bps[current] && bps.FindPrevious(value) is null)
+        //{
+        //    return true;
+        //}
 
-        if (exclusive)
+        if (bps[current] > value)
         {
             var bigger = bps.FindNext(value);
-            if (bigger is not null)
+            if (bigger is not null && exclusive)
             {
-                return width < bigger.Value.Value;
+                return bps[current] < bigger.Value.Value;
             }
+            return true;
         }
 
-        return true;
+        //var width = provider!.Bounds.Width;
+        //if (width <= value && bps.FindPrevious(width) is null && bps.FindPrevious(value) is null)
+        //{
+        //    return true;
+        //}
+
+        //if (width <= value)
+        //{
+        //    return false;
+        //}
+
+        //if (exclusive)
+        //{
+        //    var bigger = bps.FindNext(value);
+        //    if (bigger is not null)
+        //    {
+        //        return width < bigger.Value.Value;
+        //    }
+        //}
+
+        return false;
     }
 
     /// <summary>
@@ -288,7 +369,7 @@ public class Breakpoints
     /// </returns>
     public static bool IsBetween(Visual element, string lower, string upper)
     {
-        if (!TryFindBreakpoints(element, out _, out var provider))
+        if (!TryFindBreakpoints(element, out _, out var provider) || GetCurrentBreakpoint(provider) is not string current)
         {
             return true;
         }
@@ -303,8 +384,11 @@ public class Breakpoints
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(element, "Breakpoint value for '{For}' not found at breakpoint provider {Provider}.", upper, provider);
             return true;
         }
-        var width = provider!.Bounds.Width;
+        var width = bps[current];
         //return width >= lowerValue && width <= upperValue;
-        return ShouldBeVisible(element, lower) && width <= (bps.FindNext(upperValue)?.Value ?? upperValue);
+        //return ShouldBeVisible(element, lower) && width <= (bps.FindNext(upperValue)?.Value ?? upperValue);
+        var lowerVisible = ShouldBeVisible(element, lower);
+        var upperVisible = width < (bps.FindNext(upperValue)?.Value ?? upperValue);
+        return lowerVisible && upperVisible;
     }
 }

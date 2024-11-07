@@ -136,6 +136,12 @@ public sealed class BreakpointList : IEnumerable, IEnumerable<KeyValuePair<strin
         return previous == default ? null : new(previous.Key, previous.Value);
     }
 
+    public KeyValuePair<string, double>? FindCurrent(double value)
+    {
+        var current = _sortedValues.LastOrDefault(x => value >= x.Value);
+        return current == default ? FindNext(value) ?? FindPrevious(value) : new(current.Key, current.Value);
+    }
+
     /// <summary>
     /// Get an enumerator for the breakpoints. Implemented mainly for collection initializers.
     /// </summary>

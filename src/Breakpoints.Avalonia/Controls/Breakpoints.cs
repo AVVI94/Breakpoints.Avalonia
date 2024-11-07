@@ -118,6 +118,13 @@ public class Breakpoints
                 {
                     return;
                 }
+
+                if (vals.FindCurrent(newValue) is KeyValuePair<string, double> crnt)
+                {
+                    SetCurrentBreakpoint(element, crnt.Key);
+                    return;
+                }
+                //fallback
                 if (vals.FindPrevious(newValue) is KeyValuePair<string, double> current)
                 {
                     SetCurrentBreakpoint(element, current.Key);

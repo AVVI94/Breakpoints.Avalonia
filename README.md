@@ -235,11 +235,12 @@ The markup extension implementation does not support upper bounds or exclusive b
     To resolve this, you should bind the control's XAML to the breakpoint provider in the window. You can do so like this:
 
      ```xml
+    r:Breakpoints.IsBreakpointProvider="True"
     r:Breakpoints.CurrentBreakpoint="{Binding $parent[Window].(r:Breakpoints.CurrentBreakpoint)}"
     r:Breakpoints.Values="{Binding $parent[Window].(r:Breakpoints.Values)}"
      ```
 
-    Yes, the control used as content shout not be marked as a breakpoint provider, if you makr it as a provider, the breakpoints will have values of the parent but will be calculated against the proxy control.
+    Yes, the control used as content must be marked as a breakpoint provider. The current breakpoint is provided by the binding. Sadly, the breakpoint values must also be binded to the source object.
 
 ## License
 

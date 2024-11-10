@@ -81,7 +81,7 @@ Full `App.axaml` example:
 
 ### Defining breakpoints and breakpoint providers
 
-The library searches for breakpoints in the logical tree of your view for the first element that has the attached property `Breakpoints.IsBreakpointProvider` set to `True`. This element must also have the `Breakpoints.Values` property set. The `Values` property specifies the provided breakpoints. `Breakpoints.IsBreakpointProvider` can be set in XAML directly or with binding, or you can set it from code-behind. The `Breakpoints.Values` property can only be set with binding or from code-behind because the type of the property is a custom breakpoint collection which cannot be instantiated and initialized in XAML.
+The library searches for breakpoints in the logical tree of your view, looking for the first element with the attached property `Breakpoints.IsBreakpointProvider` set to `True`. This element must also have the `Breakpoints.Values` property set. The `Values` property specifies the provided breakpoints. `Breakpoints.IsBreakpointProvider` can be set in XAML directly or with binding, or you can set it from code-behind. The `Breakpoints.Values` property can only be set with binding or from code-behind because the type of the property is a custom breakpoint collection which cannot be instantiated and initialized in XAML.
 
 The logical tree is searched upwards from the element that requested the breakpoint. The breakpoint provider can be any element that inherits from `Layoutable` (basically anything that has width and height properties and will be in the logical tree), e.g., Window, UserControl, Border, Grid, etc.
 
@@ -240,7 +240,7 @@ The markup extension implementation does not support upper bounds or exclusive b
     r:Breakpoints.Values="{Binding $parent[Window].(r:Breakpoints.Values)}"
      ```
 
-    Yes, the control used as content must be marked as a breakpoint provider. The current breakpoint is provided by the binding. Sadly, the breakpoint values must also be binded to the source object.
+    Yes, the control used as content must be marked as a breakpoint provider. The current breakpoint is provided by the binding. Unfortunately, the breakpoint values must also be bound to the source object.
 
 ## License
 

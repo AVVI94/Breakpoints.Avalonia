@@ -124,7 +124,7 @@ public class BreakpointExtension : MarkupExtension
                 var prov = bpProv!;
                 var bps = Controls.Breakpoints.GetValuesActual(prov);
                 var current = Controls.Breakpoints.GetCurrentBreakpoint(prov);
-                if (!(bps?.Items.ContainsKey(current) ?? false))
+                if (current is null || !(bps?.Items.ContainsKey(current) ?? false))
                 {
                     Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(prov, "The current breakpoint '{Current}' is not defined in the Breakpoints.Values on provider {Provider}.", current, prov);
                     return AvaloniaProperty.UnsetValue;

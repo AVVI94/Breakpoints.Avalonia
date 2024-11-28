@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.XamlIl.Runtime;
@@ -121,9 +122,15 @@ public class BreakpointExtension : MarkupExtension
             },
             Converter = new FuncMultiValueConverter<object, object?>(w =>
             {
-                var prov = bpProv!;
-                var bps = Controls.Breakpoints.GetValuesActual(prov);
-                var current = Controls.Breakpoints.GetCurrentBreakpoint(prov);
+                    
+                if (bpProv is null && !Controls.Breakpoints.TryFindBreakpointProvider(target.TargetObject as Visual, out bpProv))
+                {
+                    Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(target.TargetObject, "Could not find a BreakpointProvider for target object {TargetObject}.", target.TargetObject);
+                    return AvaloniaProperty.UnsetValue;
+                }
+                var prov = bpProv;
+                var bps = prov.GetValue(Controls.Breakpoints.ValuesProperty); //Controls.Breakpoints.GetValues(prov);
+                var current = prov.GetValue(Controls.Breakpoints.CurrentBreakpointProperty); //Controls.Breakpoints.GetCurrentBreakpoint(prov);
                 if (current is null || !(bps?.Items.ContainsKey(current) ?? false))
                 {
                     Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(prov, "The current breakpoint '{Current}' is not defined in the Breakpoints.Values on provider {Provider}.", current, prov);

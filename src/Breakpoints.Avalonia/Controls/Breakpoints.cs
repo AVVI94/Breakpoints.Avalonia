@@ -11,6 +11,7 @@ using System.Text;
 using AVVI94.Breakpoints.Avalonia.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
+using System.Xml.Linq;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
@@ -21,39 +22,46 @@ public class Breakpoints
 {
     static Breakpoints()
     {
-        ValuesProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<BreakpointList>>(x =>
+        ValuesProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<BreakpointList>>(static x =>
         {
             if (x.Sender is not StyledElement s)
             {
                 Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(x.Sender, "Breakpoints.Values can only be set on StyledElement.");
                 return;
             }
-            SetValuesActual(s, x.NewValue.Value);
+        }));
+
+        IsBreakpointProviderProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(static x =>
+        {
+            if (x.Sender is not Layoutable l)
+            {
+                Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(x.Sender, "Breakpoints.IsBreakpointProvider can only be set on Layoutable.");
+                return;
+            }
+            if (l.GetValue(IsProxyProperty))
+            {
+                return;
+            }
+            l.PropertyChanged += TargetPropertyChanged;
+        }));
+
+        IsProxyProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(static p =>
+        {
+            if (p.Sender is not Layoutable l)
+            {
+                Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(p.Sender, "Breakpoints.IsProxy can only be set on Layoutable.");
+                return;
+            }
+            if (p.NewValue.Value is true)
+            {
+                l.PropertyChanged -= TargetPropertyChanged;
+            }
+            else
+            {
+                l.PropertyChanged += TargetPropertyChanged;
+            }
         }));
     }
-
-
-    /// <summary>
-    /// ValuesActual AttachedProperty definition
-    /// indicates the actual breakpoints values.
-    /// </summary>
-    public static readonly AttachedProperty<BreakpointList> ValuesActualProperty =
-        AvaloniaProperty.RegisterAttached<Breakpoints, StyledElement, BreakpointList>("ValuesActual");
-
-    /// <summary>
-    /// Accessor for Attached property <see cref="ValuesActualProperty"/>.
-    /// </summary>
-    /// <param name="element">Target element</param>
-    /// <param name="value">The value to set  <see cref="ValuesActualProperty"/>.</param>
-    internal static void SetValuesActual(StyledElement element, BreakpointList value) =>
-        element.SetValue(ValuesActualProperty, value);
-
-    /// <summary>
-    /// Accessor for Attached property <see cref="ValuesActualProperty"/>.
-    /// </summary>
-    /// <param name="element">Target element</param>
-    public static BreakpointList GetValuesActual(StyledElement element) =>
-        element.GetValue(ValuesActualProperty);
 
     /// <summary>
     /// Breakpoints AttachedProperty definition
@@ -100,48 +108,6 @@ public class Breakpoints
                 Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "Element is set to be a breakpoint provider but does not have set the Breakpoints.Values.");
             }
         }
-        element.PropertyChanged += (s, e) =>
-        {
-            if (e.Property.Name == nameof(element.Width) && e.NewValue is not null)
-            {
-                UpdateCurrentBreakpoint(element, (double)e.NewValue!);
-            }
-            if (e.Property.Name == nameof(element.Bounds) && e.NewValue is not null)
-            {
-                UpdateCurrentBreakpoint(element, ((Rect)e.NewValue!).Width);
-            }
-
-            static void UpdateCurrentBreakpoint(Layoutable element, double newValue)
-            {
-                var vals = GetValues(element);
-                if (vals is null)
-                {
-                    return;
-                }
-
-                if (vals.FindCurrent(newValue) is KeyValuePair<string, double> crnt)
-                {
-                    SetCurrentBreakpoint(element, crnt.Key);
-                    return;
-                }
-                //fallback
-                if (vals.FindPrevious(newValue) is KeyValuePair<string, double> current)
-                {
-                    SetCurrentBreakpoint(element, current.Key);
-                    return;
-                }
-                if (GetCurrentBreakpoint(element) is string bp && vals[bp] == newValue && vals.FindPrevious(newValue) is null)
-                {
-                    return;
-                }
-                if (vals.FindNext(newValue) is KeyValuePair<string, double> next)
-                {
-                    SetCurrentBreakpoint(element, next.Key);
-                    return;
-                }
-            }
-        };
-
     }
 
     /// <summary>
@@ -174,6 +140,29 @@ public class Breakpoints
     public static string GetCurrentBreakpoint(Layoutable element) =>
         element.GetValue(CurrentBreakpointProperty);
 
+
+    /// <summary>
+    /// IsProxy AttachedProperty definition
+    /// indicates ....
+    /// </summary>
+    public static readonly AttachedProperty<bool> IsProxyProperty =
+        AvaloniaProperty.RegisterAttached<Breakpoints, Layoutable, bool>("IsProxy");
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="IsProxyProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    /// <param name="value">The value to set  <see cref="IsProxyProperty"/>.</param>
+    public static void SetIsProxy(Layoutable element, bool value) =>
+        element.SetValue(IsProxyProperty, value);
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="IsProxyProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    public static bool GetIsProxy(Layoutable element) =>
+        element.GetValue(IsProxyProperty);
+
     /// <summary>
     /// Try to find the breakpoint provider of the specified element.
     /// </summary>
@@ -197,7 +186,7 @@ public class Breakpoints
         Visual? parentV = element.GetLogicalParent() as Visual;
         do
         {
-            if (parentV is Layoutable layoutable && GetIsBreakpointProvider(layoutable))
+            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty) || layoutable.GetValue(IsProxyProperty)))// GetIsBreakpointProvider(layoutable))
             {
                 break;
             }
@@ -261,7 +250,7 @@ public class Breakpoints
         Visual? parentV = element.GetLogicalParent() as Visual;
         while ((parentV = parentV?.GetLogicalParent() as Visual) is not null)
         {
-            if (parentV is Layoutable layoutable && GetIsBreakpointProvider(layoutable))
+            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty) || layoutable.GetValue(IsProxyProperty)))
             {
                 break;
             }
@@ -274,7 +263,7 @@ public class Breakpoints
             provider = null;
             return false;
         }
-        
+
         if (parent is null)
         {
             Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "No breakpoint provider found.");
@@ -283,7 +272,7 @@ public class Breakpoints
             return false;
         }
 
-        breakpoints = GetValues(parent);
+        breakpoints = parent.GetValue(ValuesProperty);
         if (breakpoints is null)
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(parent, "Element is set to be a breakpoint provider but does not have set the Breakpoints.Values.");
@@ -321,7 +310,7 @@ public class Breakpoints
             return true;
         }
 
-        var current = GetCurrentBreakpoint(provider);
+        var current = provider.GetValue(CurrentBreakpointProperty);
         if (current == breakpoint || current is null)
         {
             return true;
@@ -382,11 +371,11 @@ public class Breakpoints
     /// </returns>
     public static bool IsBetween(Visual element, string lower, string upper)
     {
-        if (!TryFindBreakpoints(element, out _, out var provider) || GetCurrentBreakpoint(provider) is not string current)
+        if (!TryFindBreakpoints(element, out _, out var provider) || provider.GetValue(CurrentBreakpointProperty) is not string current)
         {
             return true;
         }
-        var bps = GetValues(provider!);
+        var bps = provider.GetValue(ValuesProperty);
         if (!bps.TryGetValue(lower, out var lowerValue))
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(element, "Breakpoint value for '{For}' not found at breakpoint provider {Provider}.", lower, provider);
@@ -403,5 +392,52 @@ public class Breakpoints
         var lowerVisible = ShouldBeVisible(element, lower);
         var upperVisible = width < (bps.FindNext(upperValue)?.Value ?? upperValue);
         return lowerVisible && upperVisible;
+    }
+
+    private static void TargetPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (sender is not Layoutable element)
+        {
+            return;
+        }
+        if (e.Property.Name == nameof(element.Width) && e.NewValue is not null)
+        {
+            UpdateCurrentBreakpoint(element, (double)e.NewValue!);
+        }
+        if (e.Property.Name == nameof(element.Bounds) && e.NewValue is not null)
+        {
+            UpdateCurrentBreakpoint(element, ((Rect)e.NewValue!).Width);
+        }
+
+        static void UpdateCurrentBreakpoint(Layoutable element, double newValue)
+        {
+            var vals = element.GetValue(ValuesProperty);
+            if (vals is null)
+            {
+                return;
+            }
+
+            if (vals.FindCurrent(newValue) is KeyValuePair<string, double> crnt)
+            {
+                SetCurrentBreakpoint(element, crnt.Key);
+                return;
+            }
+            //fallback
+            if (vals.FindPrevious(newValue) is KeyValuePair<string, double> current)
+            {
+                SetCurrentBreakpoint(element, current.Key);
+                return;
+            }
+            if (element.GetValue(CurrentBreakpointProperty) is string bp && vals[bp] == newValue && vals.FindPrevious(newValue) is null)
+            {
+                return;
+            }
+            if (vals.FindNext(newValue) is KeyValuePair<string, double> next)
+            {
+                SetCurrentBreakpoint(element, next.Key);
+                return;
+            }
+
+        }
     }
 }

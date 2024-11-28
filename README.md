@@ -226,7 +226,7 @@ The markup extension implementation does not support upper bounds or exclusive b
 - If you set the `For` parameter of the Breakpoint control to a breakpoint that is not in the provided breakpoints, the control will always be visible.
 - If you set the `UpperBound` parameter of the Breakpoint control to a breakpoint that is not in the provided breakpoints, the control will always be visible.
 
-#### Breakpoints not working for controls created outside of XAML or attached later to the logical tree
+#### Breakpoints not working for controls created outside of XAML or attached later to the logical tree (for version <= 1.0.6)
 
 - If you instantiate controls that rely on breakpoints (either the Breakpoint control or Breakpoint markup extension) outside of XAML - such as through a dependency injection container or in the code-behind - you need to set up a breakpoint provider proxy using binding. This ensures that the breakpoint system is notified about breakpoint changes.
 
@@ -241,6 +241,22 @@ The markup extension implementation does not support upper bounds or exclusive b
      ```
 
     Yes, the control used as content must be marked as a breakpoint provider. The current breakpoint is provided by the binding. Unfortunately, the breakpoint values must also be bound to the source object.
+
+- #### Breakpoints not working for controls created outside of XAML or attached later to the logical tree (for version >= 1.0.7)
+
+- If you instantiate controls that rely on breakpoints (either the Breakpoint control or Breakpoint markup extension) outside of XAML - such as through a dependency injection container or in the code-behind - you need to set up a breakpoint provider proxy using binding. This ensures that the breakpoint system is notified about breakpoint changes.
+
+    The reason for this setup is that when a control isn't yet attached to the logical tree, the system won't automatically search for a breakpoint provider. For example, imagine you have a window acting as the breakpoint provider, and this window contains dynamic content that you set in code-behind or bind from a ViewModel. If you then instantiate a control to use within this dynamic content and use breakpoints in that control, the breakpoint provider won't be found because the control isn't yet in the logical tree.
+
+    To resolve this, you should bind the control's XAML to the breakpoint provider in the window. You can do so like this:
+
+     ```xml
+    r:Breakpoints.IsProxy="True"
+    r:Breakpoints.CurrentBreakpoint="{Binding $parent[Window].(r:Breakpoints.CurrentBreakpoint)}"
+    r:Breakpoints.Values="{Binding $parent[Window].(r:Breakpoints.Values)}"
+     ```
+
+    Yes, the control used as content must be marked as a breakpoint provider proxy. The current breakpoint is provided by the binding. Unfortunately, the breakpoint values must also be bound to the source object.
 
 ## License
 

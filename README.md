@@ -219,6 +219,45 @@ The markup extension implementation does not support upper bounds or exclusive b
 </Grid>
 ```
 
+### Using TemplatedBreakpoint control
+
+!TODO
+
+```xml
+<a:TemplatedBreakpoint>
+    <a:BreakpointTemplate For="XS">
+        <DataTemplate>
+            <TextBlock Text="Templated XS" />
+        </DataTemplate>
+    </a:BreakpointTemplate>
+    <a:BreakpointTemplate For="S">
+        <DataTemplate>
+            <TextBlock Text="Templated S" />
+        </DataTemplate>
+    </a:BreakpointTemplate>
+    <a:BreakpointTemplate For="M">
+        <DataTemplate>
+            <TextBlock Text="Templated M" />
+        </DataTemplate>
+    </a:BreakpointTemplate>
+    <a:BreakpointTemplate For="L">
+        <DataTemplate>
+            <TextBlock Text="Templated L" />
+        </DataTemplate>
+    </a:BreakpointTemplate>            
+    <a:BreakpointTemplate For="XL">
+        <DataTemplate>
+            <TextBlock Text="Templated XL" />
+        </DataTemplate>
+    </a:BreakpointTemplate>            
+    <a:BreakpointTemplate For="XXL">
+        <DataTemplate>
+            <TextBlock Text="Templated XXL" />
+        </DataTemplate>
+    </a:BreakpointTemplate>
+</a:TemplatedBreakpoint>
+```
+
 ## Edge cases and errors
 
 #### Breakpoint control visibility

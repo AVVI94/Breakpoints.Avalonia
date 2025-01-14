@@ -11,6 +11,38 @@
         mc:Ignorable="d">
     <StackPanel HorizontalAlignment="Center"
                 VerticalAlignment="Center">
+        <a:TemplatedBreakpoint>
+            <a:BreakpointTemplate For="XS">
+                <DataTemplate>
+                    <TextBlock Text="Templated XS" />
+                </DataTemplate>
+            </a:BreakpointTemplate>
+            <a:BreakpointTemplate For="S">
+                <DataTemplate>
+                    <TextBlock Text="Templated S" />
+                </DataTemplate>
+            </a:BreakpointTemplate>
+            <a:BreakpointTemplate For="M">
+                <DataTemplate>
+                    <TextBlock Text="Templated M" />
+                </DataTemplate>
+            </a:BreakpointTemplate>
+            <a:BreakpointTemplate For="L">
+                <DataTemplate>
+                    <TextBlock Text="Templated L" />
+                </DataTemplate>
+            </a:BreakpointTemplate>            
+            <a:BreakpointTemplate For="XL">
+                <DataTemplate>
+                    <TextBlock Text="Templated XL" />
+                </DataTemplate>
+            </a:BreakpointTemplate>            
+            <a:BreakpointTemplate For="XXL">
+                <DataTemplate>
+                    <TextBlock Text="Templated XXL" />
+                </DataTemplate>
+            </a:BreakpointTemplate>
+        </a:TemplatedBreakpoint>
         <a:Breakpoint For="S">
             <TextBox AcceptsReturn="True"
                      IsReadOnly="true"
@@ -52,12 +84,7 @@
         </a:Breakpoint>
 
         <TextBlock Margin="20"
-                   Text="{a:Breakpoint XS='Extra small'         
-				   S='Small',             
-				   M='Medium',                        
-				   L='Large',                                         
-				   XL='Extra Large',                                         
-				   XXL='Extra extra large'}" />
+                   Text="{a:Breakpoint XS='Extra small'                 S='Small',                     M='Medium',                                L='Large',                                                 XL='Extra Large',                                                 XXL='Extra extra large'}" />
 
         <StackPanel Orientation="{a:Breakpoint Vertical, M=Horizontal}">
             <Button Content="Button" />

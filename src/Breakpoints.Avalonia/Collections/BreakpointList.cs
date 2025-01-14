@@ -19,6 +19,10 @@ public sealed class BreakpointList : IEnumerable, IEnumerable<KeyValuePair<strin
     /// Provides a read-only view of the items in the list
     /// </summary>
     public IReadOnlyDictionary<string, double> Items => _keyValuePairs;
+    /// <summary>
+    /// Provides a read-only view of the breakpoints in the list sorted from min to max.
+    /// </summary>
+    public IEnumerable<(double Value, string Key)> SortedItems => _sortedValues;
 
     /// <summary>
     /// Add a new key-value pair to the list

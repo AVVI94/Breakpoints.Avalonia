@@ -5,6 +5,7 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Controls/Breakpoint.axaml" />
+				<ResourceInclude Source="/Controls/TemplatedBreakpoint.axaml" />
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Styles.Resources>	

@@ -63,6 +63,8 @@ public class Breakpoints
         }));
     }
 
+
+
     /// <summary>
     /// Breakpoints AttachedProperty definition
     /// indicates the breakpoints dictionary.

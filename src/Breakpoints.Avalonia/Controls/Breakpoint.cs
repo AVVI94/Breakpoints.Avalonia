@@ -1,8 +1,10 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Logging;
+using Avalonia.Metadata;
 using Avalonia.VisualTree;
 using System;
 using System.Collections.Specialized;
@@ -15,8 +17,11 @@ namespace AVVI94.Breakpoints.Avalonia.Controls;
 /// <summary>
 /// A control that can be used to hide or show content based on the current breakpoint.
 /// </summary>
-public class Breakpoint : ContentControl, IObserver<object?>
+public partial class Breakpoint : ContentControl, IObserver<object?>
 {
+    Layoutable? _breakpointProvider;
+    IDisposable? _bindingDisposable;
+
     /// <summary>
     /// Enabled StyledProperty definition
     /// </summary>
@@ -77,9 +82,6 @@ public class Breakpoint : ContentControl, IObserver<object?>
         set => SetValue(IsExclusiveProperty, value);
     }
 
-    Layoutable? _breakpointProvider;
-    IDisposable? _bindingDisposable;
-
     /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -102,21 +104,20 @@ public class Breakpoint : ContentControl, IObserver<object?>
         var binding = Controls.Breakpoints.CurrentBreakpointProperty.Bind().WithMode(BindingMode.OneWay);
         binding.Source = _breakpointProvider;
         _bindingDisposable = binding.Subscribe(this);
-
-        PropertyChanged += Breakpoint_PropertyChanged;
     }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        PropertyChanged -= Breakpoint_PropertyChanged;
         _bindingDisposable?.Dispose();
         _bindingDisposable = null;
     }
 
-    private void Breakpoint_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    /// <inheritdoc/>
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs e)
     {
+        base.OnPropertyChanged(e);
         if (e.Property.Name == nameof(Enabled))
         {
             UpdateBreakpoint();

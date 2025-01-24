@@ -221,7 +221,9 @@ The markup extension implementation does not support upper bounds or exclusive b
 
 ### Using TemplatedBreakpoint control
 
-!TODO
+The `TemplatedBreakpoint` control allows you to define templates for different breakpoints. It evaluates the current breakpoint and dynamically selects the appropriate `DataTemplate` based on the specified breakpoints. You define each `BreakpointTemplate` with the `For` property, linking it to a specific breakpoint. This control provides an easy way to implement responsive layouts, switching its entire content.
+
+This control should work with custom breakpoints (yes, I didn't test it :D).
 
 ```xml
 <a:TemplatedBreakpoint>

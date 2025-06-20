@@ -49,8 +49,6 @@ I tried to make using this library as simple as possible. All you have to do is 
 
 In your `App.axaml` file, define namespace and add the `ResponsivityBreakpoints` resource:
 
-(If you also reference the AVVI94.Breakpoints.Avalonia.Xmlns package, you can omit the xaml namespace definition)
-
 ```xml
 xmlns:avvi="using:AVVI94.Breakpoints.Avalonia"
 ```
@@ -81,9 +79,9 @@ Full `App.axaml` example:
 
 ### Defining breakpoints and breakpoint providers
 
-The library searches for breakpoints in the logical tree of your view, looking for the first element with the attached property `Breakpoints.IsBreakpointProvider` set to `True`. This element must also have the `Breakpoints.Values` property set. The `Values` property specifies the provided breakpoints. `Breakpoints.IsBreakpointProvider` can be set in XAML directly or with binding, or you can set it from code-behind. The `Breakpoints.Values` property can only be set with binding or from code-behind because the type of the property is a custom breakpoint collection which cannot be instantiated and initialized in XAML.
+The library searches for breakpoints in the [visual tree](https://docs.avaloniaui.net/docs/concepts/ui-composition#logical-and-visual-trees) of your view, looking for the first element with the attached property `Breakpoints.IsBreakpointProvider` set to `True`. This element must also have the `Breakpoints.Values` property set. The `Values` property specifies the provided breakpoints. `Breakpoints.IsBreakpointProvider` can be set in XAML directly or with binding, or you can set it from code-behind. The `Breakpoints.Values` property can only be set with binding or from code-behind because the type of the property is a custom breakpoint collection which cannot be instantiated and initialized in XAML.
 
-The logical tree is searched upwards from the element that requested the breakpoint. The breakpoint provider can be any element that inherits from `Layoutable` (basically anything that has width and height properties and will be in the logical tree), e.g., Window, UserControl, Border, Grid, etc.
+The visual tree is searched upwards from the element that requested the breakpoint. The breakpoint provider can be any element that inherits from `Layoutable` (basically anything that has width and height properties), e.g., Window, UserControl, Border, Grid, etc.
 
 #### Set up breakpoints
 
@@ -225,39 +223,63 @@ The `TemplatedBreakpoint` control allows you to define templates for different b
 
 This control should work with custom breakpoints (yes, I didn't test it :D).
 
+## Design time
+
+In design time you can set exact breakpoint anywhere in the visual tree (search upwards from the control that requested a breakpoint) of the current previewed XAML. This is done by setting the `Breakpoints.DesignCurrentBreakpointProperty` attached property to the desired breakpoint name. This will allow you to see how your UI looks like in different breakpoints.
+
+Let's say you want to see how your UI looks like in the `M` breakpoint when using templated breakpoint control. You can set the design property anywhere from the `a:TemplatedBreakpoint` all the way up to the `Window`:
+
 ```xml
-<a:TemplatedBreakpoint>
-    <a:BreakpointTemplate For="XS">
-        <DataTemplate>
-            <TextBlock Text="Templated XS" />
-        </DataTemplate>
-    </a:BreakpointTemplate>
-    <a:BreakpointTemplate For="S">
-        <DataTemplate>
-            <TextBlock Text="Templated S" />
-        </DataTemplate>
-    </a:BreakpointTemplate>
-    <a:BreakpointTemplate For="M">
-        <DataTemplate>
-            <TextBlock Text="Templated M" />
-        </DataTemplate>
-    </a:BreakpointTemplate>
-    <a:BreakpointTemplate For="L">
-        <DataTemplate>
-            <TextBlock Text="Templated L" />
-        </DataTemplate>
-    </a:BreakpointTemplate>            
-    <a:BreakpointTemplate For="XL">
-        <DataTemplate>
-            <TextBlock Text="Templated XL" />
-        </DataTemplate>
-    </a:BreakpointTemplate>            
-    <a:BreakpointTemplate For="XXL">
-        <DataTemplate>
-            <TextBlock Text="Templated XXL" />
-        </DataTemplate>
-    </a:BreakpointTemplate>
-</a:TemplatedBreakpoint>
+<Window x:Class="Breakpoints.Avalonia.TestApp.MainWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:a="https://github.com/AVVI94"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:Breakpoints.Avalonia.TestApp"
+        Title="Breakpoints.Avalonia.TestApp"
+        a:Breakpoints.IsBreakpointProvider="true"
+        d:DesignHeight="450"
+        d:DesignWidth="800"
+        mc:Ignorable="d">
+    <ScrollViewer>        
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <a:TemplatedBreakpoint a:Breakpoints.DesignCurrentBreakpoint="M">
+                <a:BreakpointTemplate For="XS">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XS" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="S">
+                    <DataTemplate>
+                        <TextBlock Text="Templated S" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="M">
+                    <DataTemplate>
+                        <TextBlock Text="Templated M" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="L">
+                    <DataTemplate>
+                        <TextBlock Text="Templated L" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>            
+                <a:BreakpointTemplate For="XL">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XL" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>            
+                <a:BreakpointTemplate For="XXL">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XXL" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+            </a:TemplatedBreakpoint>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
 ```
 
 ## Edge cases and errors
@@ -266,38 +288,6 @@ This control should work with custom breakpoints (yes, I didn't test it :D).
 
 - If you set the `For` parameter of the Breakpoint control to a breakpoint that is not in the provided breakpoints, the control will always be visible.
 - If you set the `UpperBound` parameter of the Breakpoint control to a breakpoint that is not in the provided breakpoints, the control will always be visible.
-
-#### Breakpoints not working for controls created outside of XAML or attached later to the logical tree (for version <= 1.0.6)
-
-- If you instantiate controls that rely on breakpoints (either the Breakpoint control or Breakpoint markup extension) outside of XAML - such as through a dependency injection container or in the code-behind - you need to set up a breakpoint provider proxy using binding. This ensures that the breakpoint system is notified about breakpoint changes.
-
-    The reason for this setup is that when a control isn't yet attached to the logical tree, the system won't automatically search for a breakpoint provider. For example, imagine you have a window acting as the breakpoint provider, and this window contains dynamic content that you set in code-behind or bind from a ViewModel. If you then instantiate a control to use within this dynamic content and use breakpoints in that control, the breakpoint provider won't be found because the control isn't yet in the logical tree.
-
-    To resolve this, you should bind the control's XAML to the breakpoint provider in the window. You can do so like this:
-
-     ```xml
-    r:Breakpoints.IsBreakpointProvider="True"
-    r:Breakpoints.CurrentBreakpoint="{Binding $parent[Window].(r:Breakpoints.CurrentBreakpoint)}"
-    r:Breakpoints.Values="{Binding $parent[Window].(r:Breakpoints.Values)}"
-     ```
-
-    Yes, the control used as content must be marked as a breakpoint provider. The current breakpoint is provided by the binding. Unfortunately, the breakpoint values must also be bound to the source object.
-
-- #### Breakpoints not working for controls created outside of XAML or attached later to the logical tree (for version >= 1.0.7)
-
-- If you instantiate controls that rely on breakpoints (either the Breakpoint control or Breakpoint markup extension) outside of XAML - such as through a dependency injection container or in the code-behind - you need to set up a breakpoint provider proxy using binding. This ensures that the breakpoint system is notified about breakpoint changes.
-
-    The reason for this setup is that when a control isn't yet attached to the logical tree, the system won't automatically search for a breakpoint provider. For example, imagine you have a window acting as the breakpoint provider, and this window contains dynamic content that you set in code-behind or bind from a ViewModel. If you then instantiate a control to use within this dynamic content and use breakpoints in that control, the breakpoint provider won't be found because the control isn't yet in the logical tree.
-
-    To resolve this, you should bind the control's XAML to the breakpoint provider in the window. You can do so like this:
-
-     ```xml
-    r:Breakpoints.IsProxy="True"
-    r:Breakpoints.CurrentBreakpoint="{Binding $parent[Window].(r:Breakpoints.CurrentBreakpoint)}"
-    r:Breakpoints.Values="{Binding $parent[Window].(r:Breakpoints.Values)}"
-     ```
-
-    Yes, the control used as content must be marked as a breakpoint provider proxy. The current breakpoint is provided by the binding. Unfortunately, the breakpoint values must also be bound to the source object.
 
 ## License
 

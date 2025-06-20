@@ -92,6 +92,18 @@ public partial class Breakpoint : ContentControl, IObserver<object?>
             throw new InvalidOperationException("The For property must be set to a valid breakpoint value.");
         }
 
+        if (Design.IsDesignMode)
+        {
+            var src = Breakpoints.FindDesignTimeParentWithDesignBreakpoint(this);
+            if (src is null)
+            {
+                IsVisible = Enabled = true;
+                return;
+            }
+            IsVisible = Breakpoints.GetDesignCurrentBreakpoint(src) == For;
+            return;
+        }
+
         if (!Breakpoints.TryFindBreakpoints(this, out _, out _breakpointProvider))
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(this, "Breakpoint not found, setting the Enabled property to true so this element is always visible.");

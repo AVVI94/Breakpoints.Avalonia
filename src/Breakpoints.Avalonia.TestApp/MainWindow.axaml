@@ -4,11 +4,13 @@
         xmlns:a="https://github.com/AVVI94"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:Breakpoints.Avalonia.TestApp"
         Title="Breakpoints.Avalonia.TestApp"
         a:Breakpoints.IsBreakpointProvider="true"
         d:DesignHeight="450"
         d:DesignWidth="800"
         mc:Ignorable="d">
+    <ScrollViewer>        
     <StackPanel HorizontalAlignment="Center"
                 VerticalAlignment="Center">
         <a:TemplatedBreakpoint>
@@ -31,12 +33,12 @@
                 <DataTemplate>
                     <TextBlock Text="Templated L" />
                 </DataTemplate>
-            </a:BreakpointTemplate>            
+            </a:BreakpointTemplate>
             <a:BreakpointTemplate For="XL">
                 <DataTemplate>
                     <TextBlock Text="Templated XL" />
                 </DataTemplate>
-            </a:BreakpointTemplate>            
+            </a:BreakpointTemplate>
             <a:BreakpointTemplate For="XXL">
                 <DataTemplate>
                     <TextBlock Text="Templated XXL" />
@@ -84,7 +86,7 @@
         </a:Breakpoint>
 
         <TextBlock Margin="20"
-                   Text="{a:Breakpoint XS='Extra small'                 S='Small',                     M='Medium',                                L='Large',                                                 XL='Extra Large',                                                 XXL='Extra extra large'}" />
+                   Text="{a:Breakpoint XS='Extra small' S='Small', M='Medium', L='Large', XL='Extra Large', XXL='Extra extra large'}" />
 
         <StackPanel Orientation="{a:Breakpoint Vertical, M=Horizontal}">
             <Button Content="Button" />
@@ -114,5 +116,7 @@
                        Height="50"
                        Fill="Blue" />
         </Grid>
+        <local:UserControl1 />
     </StackPanel>
+    </ScrollViewer>
 </Window>

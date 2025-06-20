@@ -1,23 +1,32 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Layout;
-using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using Avalonia.Markup.Xaml.XamlIl.Runtime;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive.Subjects;
+using System.Text;
 using System.Threading;
+using Avalonia = global::Avalonia;
+using BP = AVVI94.Breakpoints.Avalonia.Controls.Breakpoints;
+using NsBreakpoints = AVVI94.Breakpoints.Avalonia;
 
 namespace AVVI94.Breakpoints.Avalonia.Markup;
 
-/// <summary>
-/// Markup extension to provide values based on the current breakpoint
-/// </summary>
-public class BreakpointExtension : MarkupExtension
+public class BreakpointExtension : MarkupExtension, IObservable<object>, IDisposable
 {
+    private readonly Subject<object> _subject = new();
+    private Visual? _target;
+    private Type? _targetType;
+    private Visual? _provider;
+    private string? _previousBreakpoint;
+    private object? _previousValue;
+
     /// <summary>
     /// Create a new instance of BreakpointExtension
     /// </summary>
@@ -71,98 +80,151 @@ public class BreakpointExtension : MarkupExtension
     /// </summary>
     public object? ConverterParameter { get; set; }
 
-    object? _previousValue = AvaloniaProperty.UnsetValue;
-    string _previousBreakpoint = "";
-
     /// <inheritdoc/>
     public override object ProvideValue(IServiceProvider serviceProvider)
     {
         var target = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget))!;
-        var targetProperty = target.TargetProperty as AvaloniaProperty;
-        var targetType = (targetProperty?.PropertyType)
-            ?? throw new InvalidOperationException("The target property is not an AvaloniaProperty.");
+        if (target.TargetProperty is not AvaloniaProperty ap)
+        {
+            throw new InvalidOperationException("Target property is not an AvaloniaProperty.");
+        }
+        _targetType = ap.PropertyType;
+
+        SetTarget(serviceProvider, target);
+        if (_target is null)
+        {
+            throw new InvalidOperationException("No Visual parent found for the target object.");
+        }
+
+        if (_target.IsAttachedToVisualTree())
+        {
+            _provider = BP.TryFindBreakpoints(_target, out _, out var breakpointProvider) ? breakpointProvider : null;
+            if (_provider is null)
+            {
+                // If no provider is found, we set the default value to the target property
+                Dispose();
+                return AvaloniaProperty.UnsetValue;
+            }
+
+            _provider.PropertyChanged += Provider_PropertyChanged;
+        }
+        else
+        {
+            // If not attached, we use a TreeAttachmentNotifier to handle the attachment later
+            _target.AttachedToVisualTree += Target_AttachedToVisualTree;
+        }
+
+        return this.ToBinding();
+    }
+
+    private void Target_AttachedToVisualTree(object sender, VisualTreeAttachmentEventArgs e)
+    {
+        if (_target is null)
+        {
+            return;
+        }
+        _target.AttachedToVisualTree -= Target_AttachedToVisualTree;
 
         if (Design.IsDesignMode)
         {
-            return ConvertValue(targetType, XXL ?? XL ?? L ?? M ?? S ?? XS ?? Default!)!;
+            // In design mode, we do not need to subscribe to the provider
+            // We just set the default value based on the current design breakpoint
+            var src = BP.FindDesignTimeParentWithDesignBreakpoint(_target);
+            if (src is null)
+            {
+                _subject.OnNext(Default ?? AvaloniaProperty.UnsetValue);
+                Dispose();
+                return;
+            }
+            NextValue(BP.GetDesignCurrentBreakpoint(src));
+            Dispose();
+            return;
         }
 
-        if (target.TargetObject is not Visual visual
-            || !Controls.Breakpoints.TryFindBreakpointProvider(visual, out var bpProv))
+        _provider = BP.TryFindBreakpoints(_target, out _, out var breakpointProvider) ? breakpointProvider : null;
+
+        if (_provider is null)
         {
-            // If the target object is not a Visual, to find first parent Visual that is a BreakpointProvider
-            // If this fails I have no idea what to do, so I return UnsetValue
-            var parents = (IAvaloniaXamlIlParentStackProvider)serviceProvider.GetService(typeof(IAvaloniaXamlIlParentStackProvider))!;
-            if (parents.Parents.Any())
+            // If no provider is found, we set the default value to the target property
+            _subject.OnNext(Default ?? AvaloniaProperty.UnsetValue);
+            Dispose();
+            return;
+        }
+
+        _provider.PropertyChanged += Provider_PropertyChanged;
+        NextValue();
+    }
+
+    private void Provider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (_provider is null)
+        {
+            return;
+        }
+
+        if (e.Property == BP.CurrentBreakpointProperty)
+        {
+            NextValue();
+            return;
+        }
+    }
+
+    protected virtual void NextValue()
+    {
+        Debug.Assert(_provider is not null);
+        Debug.Assert(_target is not null);
+
+        var currentBreakpoint = _provider!.GetValue(BP.CurrentBreakpointProperty);
+        if (currentBreakpoint is null || currentBreakpoint == _previousBreakpoint)
+        {
+            _subject.OnNext(_previousValue ?? AvaloniaProperty.UnsetValue);
+            return;
+        }
+
+        NextValue(currentBreakpoint);
+    }
+
+    protected void NextValue(string currentBreakpoint)
+    {
+        _previousBreakpoint = currentBreakpoint;
+        var value = currentBreakpoint switch
+        {
+            "XS" => XS ?? Default,
+            "S" => S ?? XS ?? Default,
+            "M" => M ?? S ?? XS ?? Default,
+            "L" => L ?? M ?? S ?? XS ?? Default,
+            "XL" => XL ?? L ?? M ?? S ?? XS ?? Default,
+            "XXL" => XXL ?? XL ?? L ?? M ?? S ?? XS ?? Default,
+            _ => AvaloniaProperty.UnsetValue
+        };
+
+        if (value == AvaloniaProperty.UnsetValue || value is null)
+        {
+            _subject.OnNext(AvaloniaProperty.UnsetValue);
+            return;
+        }
+
+        _subject.OnNext(_previousValue = ConvertValue(_targetType!, value) ?? AvaloniaProperty.UnsetValue);
+    }
+
+    private void SetTarget(IServiceProvider serviceProvider, IProvideValueTarget target)
+    {
+        if (target.TargetObject is Visual visualTarget)
+        {
+            _target = visualTarget;
+        }
+        else
+        {
+            var parentStack = (IAvaloniaXamlIlParentStackProvider)serviceProvider.GetService(typeof(IAvaloniaXamlIlParentStackProvider))!;
+            foreach (var parent in parentStack.Parents)
             {
-                foreach (var p in parents.Parents)
+                if (parent is Visual visualParent)
                 {
-                    if (p is Visual v && Controls.Breakpoints.TryFindBreakpointProvider(v, out bpProv))
-                    {
-                        visual = v;
-                        goto BindingSetup;
-                    }
+                    _target = visualParent;
+                    break;
                 }
             }
-            return AvaloniaProperty.UnsetValue;
         }
-
-    BindingSetup:
-        var valuesBinding = Controls.Breakpoints.ValuesProperty.Bind();
-        valuesBinding.Source = bpProv;
-        var currentBpBinding = Controls.Breakpoints.CurrentBreakpointProperty.Bind();
-        currentBpBinding.Source = bpProv;
-        return new MultiBinding()
-        {
-            Bindings =
-            {
-                valuesBinding.ToBinding(),
-                currentBpBinding.ToBinding(),
-                new Binding("Width") { Source = bpProv }
-            },
-            Converter = new FuncMultiValueConverter<object, object?>(w =>
-            {
-                    
-                if (bpProv is null && !Controls.Breakpoints.TryFindBreakpointProvider(target.TargetObject as Visual, out bpProv))
-                {
-                    Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(target.TargetObject, "Could not find a BreakpointProvider for target object {TargetObject}.", target.TargetObject);
-                    return AvaloniaProperty.UnsetValue;
-                }
-                var prov = bpProv;
-                var bps = prov.GetValue(Controls.Breakpoints.ValuesProperty); //Controls.Breakpoints.GetValues(prov);
-                var current = prov.GetValue(Controls.Breakpoints.CurrentBreakpointProperty); //Controls.Breakpoints.GetCurrentBreakpoint(prov);
-                if (current is null || !(bps?.Items.ContainsKey(current) ?? false))
-                {
-                    Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(prov, "The current breakpoint '{Current}' is not defined in the Breakpoints.Values on provider {Provider}.", current, prov);
-                    return AvaloniaProperty.UnsetValue;
-                }
-
-                if (current == _previousBreakpoint)
-                    return _previousValue;
-                _previousBreakpoint = current;
-                var value = current switch
-                {
-                    "XS" => XS ?? Default,
-                    "S" => S ?? XS ?? Default,
-                    "M" => M ?? S ?? XS ?? Default,
-                    "L" => L ?? M ?? S ?? XS ?? Default,
-                    "XL" => XL ?? L ?? M ?? S ?? XS ?? Default,
-                    "XXL" => XXL ?? XL ?? L ?? M ?? S ?? XS ?? Default,
-                    _ => AvaloniaProperty.UnsetValue
-                };
-
-                if (value == AvaloniaProperty.UnsetValue || value is null)
-                {
-                    return _previousValue = Converter is not null ? Converter?.Convert(value,
-                                                                                      targetType,
-                                                                                      ConverterParameter,
-                                                                                      Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))
-                    : AvaloniaProperty.UnsetValue;
-                }
-
-                return ConvertValue(targetType, value);
-            })
-        };
     }
 
     private object? ConvertValue(Type targetType, object value)
@@ -197,11 +259,27 @@ public class BreakpointExtension : MarkupExtension
             v = value;
         }
 
+        return Converter is null ? v
+        : Converter.Convert(v,
+                            targetType,
+                            ConverterParameter,
+                            Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture));
+    }
 
-        return _previousValue = Converter is not null ? Converter?.Convert(v,
-                                                                          targetType,
-                                                                          ConverterParameter,
-                                                                          Dispatcher.UIThread.Invoke(() => Thread.CurrentThread.CurrentUICulture))
-        : v;
+    /// <inheritdoc/>
+    public IDisposable Subscribe(IObserver<object> observer)
+    {
+        return _subject.Subscribe(observer);
+    }
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        if (Design.IsDesignMode)
+        {
+            return;
+        }
+        _subject.OnCompleted();
+        _subject.Dispose();
     }
 }

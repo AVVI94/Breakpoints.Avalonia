@@ -1,0 +1,129 @@
+<UserControl x:Class="Breakpoints.Avalonia.TestApp.UserControl1"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:a="https://github.com/AVVI94"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="2050"
+             a:Breakpoints.DesignCurrentBreakpoint="L"
+             d:DesignWidth="800"
+             mc:Ignorable="d">
+    <DockPanel Margin="0,32,0,0"
+               LastChildFill="False">
+        <TextBlock DockPanel.Dock="Top"
+                   Text="Nested content that was problematic..." />
+
+        <TextBlock DockPanel.Dock="Top"
+                   Text="{a:Breakpoint Default='sdfsdf' XS='Nested Extra small' S='Nested Small', M='Nested Medium', L='Nested Large', XL='Nested Extra Large', XXL='Nested Extra extra large'}" />
+
+        <StackPanel Margin="0,32,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    DockPanel.Dock="Top">
+            <a:TemplatedBreakpoint>
+                <a:BreakpointTemplate For="XS">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XS" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="S">
+                    <DataTemplate>
+                        <TextBlock Text="Templated S" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="M">
+                    <DataTemplate>
+                        <TextBlock Text="Templated M" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="L">
+                    <DataTemplate>
+                        <TextBlock Text="Templated L" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="XL">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XL" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+                <a:BreakpointTemplate For="XXL">
+                    <DataTemplate>
+                        <TextBlock Text="Templated XXL" />
+                    </DataTemplate>
+                </a:BreakpointTemplate>
+            </a:TemplatedBreakpoint>
+            <a:Breakpoint For="S">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;S&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Small&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="M">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;M&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Medium&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="L">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;L&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Large&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="S"
+                          IsExclusive="True">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;S&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Small&quot; IsExclusive=&quot;True&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="M"
+                          IsExclusive="True">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;M&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Medium&quot; IsExclusive=&quot;True&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="L"
+                          IsExclusive="True">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;L&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Large&quot; IsExclusive=&quot;True&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+            <a:Breakpoint For="S"
+                          UpperBound="L">
+                <TextBox AcceptsReturn="True"
+                         IsReadOnly="true"
+                         Text="&lt;a:Breakpoint For=&quot;S&quot; UpperBound=&quot;L&quot;&gt;&#10;&#x09;&lt;TextBlock Text=&quot;Small UpperBound L&quot; /&gt;&#10;&lt;/a:Breakpoint&gt;&#10;" />
+            </a:Breakpoint>
+
+            <TextBlock Margin="20"
+                       Text="{a:Breakpoint XS='Extra small' S='Small', M='Medium', L='Large', XL='Extra Large', XXL='Extra extra large'}" />
+
+            <StackPanel Orientation="{a:Breakpoint Vertical, M=Horizontal}">
+                <Button Content="Button" />
+                <Button Content="Button" />
+                <Button Content="Button" />
+                <Button Content="Button" />
+                <Button Content="Button" />
+                <Button Content="Button" />
+            </StackPanel>
+            <TextBox x:Name="GridInfoTextBox"
+                     AcceptsReturn="True"
+                     IsReadOnly="True" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="{a:Breakpoint 50, M=100, L=150, XL=200, XXL=250}" />
+                </Grid.ColumnDefinitions>
+                <Rectangle Grid.Column="0"
+                           Height="50"
+                           Fill="Red" />
+                <Rectangle Grid.Column="1"
+                           Height="50"
+                           MinWidth="50"
+                           Fill="Green" />
+                <Rectangle Grid.Column="2"
+                           Height="50"
+                           Fill="Blue" />
+            </Grid>
+        </StackPanel>
+
+    </DockPanel>
+</UserControl>

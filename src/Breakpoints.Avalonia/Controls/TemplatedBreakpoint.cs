@@ -46,6 +46,26 @@ public class TemplatedBreakpoint : ContentControl, IObserver<object?>, IAddChild
     {
         base.OnAttachedToVisualTree(e);
 
+        if (Design.IsDesignMode)
+        {
+            var src = Breakpoints.FindDesignTimeParentWithDesignBreakpoint(this);
+            BreakpointTemplate? template = BreakpointTemplates.First();
+            if (src is not null)
+            {
+                var bp = Breakpoints.GetDesignCurrentBreakpoint(src);
+                foreach (var item in BreakpointTemplates)             
+                {
+                    if (item.For == bp)
+                    {
+                        template = item;
+                        break;
+                    }
+                }
+            }
+            Content = template?.ContentTemplate?.Build(null);
+            return;
+        }
+
         if (!Breakpoints.TryFindBreakpoints(this, out _, out _breakpointProvider))
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(this, "Breakpoint not found, setting the Enabled property to true so this element is always visible.");

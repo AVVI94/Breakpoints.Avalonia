@@ -1,4 +1,7 @@
 ﻿using System.Collections.Generic;
+using Avalonia = global::Avalonia;
+using BP = AVVI94.Breakpoints.Avalonia.Controls.Breakpoints;
+using NsBreakpoints = AVVI94.Breakpoints.Avalonia;
 
 namespace AVVI94.Breakpoints.Avalonia.Collections;
 

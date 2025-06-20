@@ -1,24 +1,20 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Logging;
-using Avalonia.LogicalTree;
 using Avalonia.Reactive;
 using Avalonia.VisualTree;
-using System;
+using AVVI94.Breakpoints.Avalonia.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using AVVI94.Breakpoints.Avalonia.Collections;
 using System.Diagnostics.CodeAnalysis;
-using Avalonia.Controls;
-using System.Xml.Linq;
 
 namespace AVVI94.Breakpoints.Avalonia.Controls;
 
 /// <summary>
 /// Breakpoints AttachedProperty definition and helper methods.
 /// </summary>
-public class Breakpoints
+public partial class Breakpoints
 {
     static Breakpoints()
     {
@@ -38,30 +34,31 @@ public class Breakpoints
                 Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(x.Sender, "Breakpoints.IsBreakpointProvider can only be set on Layoutable.");
                 return;
             }
-            if (l.GetValue(IsProxyProperty))
-            {
-                return;
-            }
             l.PropertyChanged += TargetPropertyChanged;
         }));
-
-        IsProxyProperty.Changed.Subscribe(new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(static p =>
-        {
-            if (p.Sender is not Layoutable l)
-            {
-                Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(p.Sender, "Breakpoints.IsProxy can only be set on Layoutable.");
-                return;
-            }
-            if (p.NewValue.Value is true)
-            {
-                l.PropertyChanged -= TargetPropertyChanged;
-            }
-            else
-            {
-                l.PropertyChanged += TargetPropertyChanged;
-            }
-        }));
     }
+
+    /// <summary>
+    /// DesignCurrentBreakpoint AttachedProperty definition
+    /// indicates ....
+    /// </summary>
+    public static readonly AttachedProperty<string> DesignCurrentBreakpointProperty =
+        AvaloniaProperty.RegisterAttached<Layoutable, string>("DesignCurrentBreakpoint", typeof(Breakpoints));
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="DesignCurrentBreakpointProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    /// <param name="value">The value to set  <see cref="DesignCurrentBreakpointProperty"/>.</param>
+    public static void SetDesignCurrentBreakpoint(Layoutable element, string value) =>
+        element.SetValue(DesignCurrentBreakpointProperty, value);
+
+    /// <summary>
+    /// Accessor for Attached property <see cref="DesignCurrentBreakpointProperty"/>.
+    /// </summary>
+    /// <param name="element">Target element</param>
+    public static string GetDesignCurrentBreakpoint(Layoutable element) =>
+        element.GetValue(DesignCurrentBreakpointProperty);
 
 
 
@@ -88,6 +85,7 @@ public class Breakpoints
         element.GetValue(ValuesProperty);
 
 
+
     /// <summary>
     /// IsBreakpointProvider AttachedProperty definition
     /// indicates whether the element should provide breakpoints or not.
@@ -103,12 +101,9 @@ public class Breakpoints
     public static void SetIsBreakpointProvider(Layoutable element, bool value)
     {
         element.SetValue(IsBreakpointProviderProperty, value);
-        if (value)
+        if (value && !element.IsSet(ValuesProperty))
         {
-            if (GetValues(element) is null)
-            {
-                Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "Element is set to be a breakpoint provider but does not have set the Breakpoints.Values.");
-            }
+            Logger.TryGet(LogEventLevel.Warning, LogArea.Visual)?.Log(element, "Element is set to be a breakpoint provider but does not have set the Breakpoints.Values.");
         }
     }
 
@@ -118,6 +113,7 @@ public class Breakpoints
     /// <param name="element">Target element</param>
     public static bool GetIsBreakpointProvider(Layoutable element) =>
         element.GetValue(IsBreakpointProviderProperty);
+
 
 
     /// <summary>
@@ -142,29 +138,6 @@ public class Breakpoints
     public static string GetCurrentBreakpoint(Layoutable element) =>
         element.GetValue(CurrentBreakpointProperty);
 
-
-    /// <summary>
-    /// IsProxy AttachedProperty definition
-    /// indicates ....
-    /// </summary>
-    public static readonly AttachedProperty<bool> IsProxyProperty =
-        AvaloniaProperty.RegisterAttached<Breakpoints, Layoutable, bool>("IsProxy");
-
-    /// <summary>
-    /// Accessor for Attached property <see cref="IsProxyProperty"/>.
-    /// </summary>
-    /// <param name="element">Target element</param>
-    /// <param name="value">The value to set  <see cref="IsProxyProperty"/>.</param>
-    public static void SetIsProxy(Layoutable element, bool value) =>
-        element.SetValue(IsProxyProperty, value);
-
-    /// <summary>
-    /// Accessor for Attached property <see cref="IsProxyProperty"/>.
-    /// </summary>
-    /// <param name="element">Target element</param>
-    public static bool GetIsProxy(Layoutable element) =>
-        element.GetValue(IsProxyProperty);
-
     /// <summary>
     /// Try to find the breakpoint provider of the specified element.
     /// </summary>
@@ -185,17 +158,16 @@ public class Breakpoints
             return false;
         }
 
-        Visual? parentV = element.GetLogicalParent() as Visual;
+        Visual? parentV = element.GetVisualParent();
         do
         {
-            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty) || layoutable.GetValue(IsProxyProperty)))// GetIsBreakpointProvider(layoutable))
+            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty)))// GetIsBreakpointProvider(layoutable))
             {
                 break;
             }
 
         }
-        while ((parentV = parentV?.GetLogicalParent() as Visual) is not null);
-
+        while ((parentV = parentV?.GetVisualParent()) is not null);
 
         if (parentV is null)
         {
@@ -249,10 +221,10 @@ public class Breakpoints
             return false;
         }
 
-        Visual? parentV = element.GetLogicalParent() as Visual;
-        while ((parentV = parentV?.GetLogicalParent() as Visual) is not null)
+        Visual? parentV = element.GetVisualParent() as Visual;
+        while ((parentV = parentV?.GetVisualParent() as Visual) is not null)
         {
-            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty) || layoutable.GetValue(IsProxyProperty)))
+            if (parentV is Layoutable layoutable && (layoutable.GetValue(IsBreakpointProviderProperty)))
             {
                 break;
             }
@@ -441,5 +413,23 @@ public class Breakpoints
             }
 
         }
+    }
+
+    internal static Layoutable? FindDesignTimeParentWithDesignBreakpoint(Visual? target)
+    {
+        if (target is null || !Design.IsDesignMode)
+        {
+            return null;
+        }
+        var parent = target;
+        while (parent is not null)
+        {
+            if (parent is Layoutable layoutable && layoutable.IsSet(DesignCurrentBreakpointProperty))
+            {
+                return layoutable;
+            }
+            parent = parent.GetVisualParent();
+        }
+        return null;
     }
 }

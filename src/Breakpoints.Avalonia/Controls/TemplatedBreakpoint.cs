@@ -17,14 +17,13 @@ namespace AVVI94.Breakpoints.Avalonia.Controls;
 /// <summary>
 /// A control that can change its content based on the current breakpoint
 /// </summary>
-public class TemplatedBreakpoint : ContentControl, IObserver<object?>, IAddChild<BreakpointTemplate>
+public class TemplatedBreakpoint : ContentControl, IAddChild<BreakpointTemplate>, IDisposable
 {
     /// <summary>
     /// Breakpoint provider resolved for this control.
     /// </summary>
     protected Layoutable? _breakpointProvider;
-    IDisposable? _bindingDisposable;
-
+    
     /// <summary>
     /// BreakpointTemplates StyledProperty definition
     /// </summary>
@@ -53,7 +52,7 @@ public class TemplatedBreakpoint : ContentControl, IObserver<object?>, IAddChild
             if (src is not null)
             {
                 var bp = Breakpoints.GetDesignCurrentBreakpoint(src);
-                foreach (var item in BreakpointTemplates)             
+                foreach (var item in BreakpointTemplates)
                 {
                     if (item.For == bp)
                     {
@@ -74,17 +73,23 @@ public class TemplatedBreakpoint : ContentControl, IObserver<object?>, IAddChild
 
         Debug.Assert(_breakpointProvider is not null);
 
-        var binding = Controls.Breakpoints.CurrentBreakpointProperty.Bind().WithMode(BindingMode.OneWay);
-        binding.Source = _breakpointProvider;
-        _bindingDisposable = binding.Subscribe(this);
+        _breakpointProvider!.PropertyChanged += TemplatedBreakpoint_PropertyChanged;
+        UpdateBreakpoint();
+    }
+
+    private void TemplatedBreakpoint_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == Breakpoints.CurrentBreakpointProperty)
+        {
+            UpdateBreakpoint();
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        _bindingDisposable?.Dispose();
-        _bindingDisposable = null;
+        Dispose();
     }
 
     /// <summary>
@@ -135,31 +140,23 @@ public class TemplatedBreakpoint : ContentControl, IObserver<object?>, IAddChild
 
         Content = selectedTemplate?.ContentTemplate?.Build(null);
     }
-    private Control? _current;
-
-    /// <inheritdoc/>
-    public void OnCompleted()
-    {
-        _bindingDisposable?.Dispose();
-        _bindingDisposable = null;
-    }
-
-    /// <inheritdoc/>
-    public void OnError(Exception error)
-    {
-        Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(this, "Error during breakpoint subscription. {Error}", error);
-    }
-
-    /// <inheritdoc/>
-    public void OnNext(object? value)
-    {
-        UpdateBreakpoint();
-    }
 
     /// <inheritdoc/>
     public void AddChild(BreakpointTemplate child)
     {
         this.BreakpointTemplates.Add(child);
+    }
+
+    public void Dispose()
+    {
+        if (_breakpointProvider is not null)
+        {
+            _breakpointProvider.PropertyChanged -= TemplatedBreakpoint_PropertyChanged;
+            _breakpointProvider = null;
+        }
+        BreakpointTemplates.Clear();
+        Content = null;
+        InvalidateVisual();
     }
 }
 

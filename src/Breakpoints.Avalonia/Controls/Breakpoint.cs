@@ -17,10 +17,10 @@ namespace AVVI94.Breakpoints.Avalonia.Controls;
 /// <summary>
 /// A control that can be used to hide or show content based on the current breakpoint.
 /// </summary>
-public partial class Breakpoint : ContentControl, IObserver<object?>
+public partial class Breakpoint : ContentControl, IDisposable
 {
+    private bool _isDisposed;
     Layoutable? _breakpointProvider;
-    IDisposable? _bindingDisposable;
 
     /// <summary>
     /// Enabled StyledProperty definition
@@ -113,17 +113,23 @@ public partial class Breakpoint : ContentControl, IObserver<object?>
 
         Debug.Assert(_breakpointProvider is not null);
 
-        var binding = Controls.Breakpoints.CurrentBreakpointProperty.Bind().WithMode(BindingMode.OneWay);
-        binding.Source = _breakpointProvider;
-        _bindingDisposable = binding.Subscribe(this);
+        _breakpointProvider!.PropertyChanged += BreakpointProvider_PropertyChanged;
+        UpdateBreakpoint();
+    }
+
+    private void BreakpointProvider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == Breakpoints.CurrentBreakpointProperty)
+        {
+            UpdateBreakpoint();
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        _bindingDisposable?.Dispose();
-        _bindingDisposable = null;
+        Dispose();
     }
 
     /// <inheritdoc/>
@@ -150,24 +156,37 @@ public partial class Breakpoint : ContentControl, IObserver<object?>
             return;
         }
         IsVisible = Breakpoints.ShouldBeVisible(this, For, IsExclusive);
+    }  
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    /// <inheritdoc/>
-    public void OnCompleted()
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="Breakpoint"/> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected virtual void Dispose(bool disposing)
     {
-        _bindingDisposable?.Dispose();
-        _bindingDisposable = null;
-    }
+        if (_isDisposed)
+            return;
 
-    /// <inheritdoc/>
-    public void OnError(Exception error)
-    {
-        Logger.TryGet(LogEventLevel.Error, LogArea.Visual)?.Log(this, "Error during breakpoint subscription. {Error}", error);
-    }
+        if (disposing)
+        {
+            // dispose managed resources here
+            if (_breakpointProvider != null)
+            {
+                _breakpointProvider.PropertyChanged -= BreakpointProvider_PropertyChanged;
+            }
+        }
 
-    /// <inheritdoc/>
-    public void OnNext(object? value)
-    {
-        UpdateBreakpoint();
+        // dispose unmanaged resources here
+        _breakpointProvider = null;
+        _isDisposed = true;
     }
 }

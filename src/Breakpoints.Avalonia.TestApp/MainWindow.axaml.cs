@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using AVVI94.Breakpoints.Avalonia.Collections;
+using System;
 using System.Diagnostics;
 
 namespace Breakpoints.Avalonia.TestApp
@@ -31,6 +32,25 @@ namespace Breakpoints.Avalonia.TestApp
                 	<Rectangle Height="50" Fill="Blue" Grid.Column="2" />
                 </Grid>
                 """;
+        }
+
+        bool flag = false;
+        private void Button_Click(object? sender, global::Avalonia.Interactivity.RoutedEventArgs e)
+        {
+            var button = (Button)sender!;
+            if(flag)
+            {
+                ((StackPanel)button.Parent!).Children.RemoveAt(((StackPanel)button.Parent).Children.Count - 1);
+                flag = false;
+            }
+            else
+            {
+                ((StackPanel)button.Parent!).Children.Add(new UserControl1());
+                flag = true;
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
     }
 }

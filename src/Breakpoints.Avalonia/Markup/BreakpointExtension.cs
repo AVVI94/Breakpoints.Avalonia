@@ -133,7 +133,7 @@ public class BreakpointExtension : MarkupExtension, IObservable<object>, IDispos
             var src = BP.FindDesignTimeParentWithDesignBreakpoint(_target);
             if (src is null)
             {
-                _subject.OnNext(Default ?? AvaloniaProperty.UnsetValue);
+                NextValue("XS");
                 Dispose();
                 return;
             }

@@ -117,7 +117,7 @@ public partial class Breakpoint : ContentControl, IDisposable
         UpdateBreakpoint();
     }
 
-    private void BreakpointProvider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private void BreakpointProvider_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == Breakpoints.CurrentBreakpointProperty)
         {

@@ -77,7 +77,7 @@ public class TemplatedBreakpoint : ContentControl, IAddChild<BreakpointTemplate>
         UpdateBreakpoint();
     }
 
-    private void TemplatedBreakpoint_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private void TemplatedBreakpoint_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (e.Property == Breakpoints.CurrentBreakpointProperty)
         {

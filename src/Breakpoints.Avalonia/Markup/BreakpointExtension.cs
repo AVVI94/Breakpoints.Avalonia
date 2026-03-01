@@ -114,10 +114,10 @@ public class BreakpointExtension : MarkupExtension, IObservable<object>, IDispos
             _target.AttachedToVisualTree += Target_AttachedToVisualTree;
         }
 
-        return this.ToBinding();
+        return AvaloniaObjectExtensions.ToBinding(this);
     }
 
-    private void Target_AttachedToVisualTree(object sender, VisualTreeAttachmentEventArgs e)
+    private void Target_AttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         if (_target is null)
         {
@@ -156,12 +156,12 @@ public class BreakpointExtension : MarkupExtension, IObservable<object>, IDispos
         NextValue();
     }
 
-    private void Target_DetachedFromVisualTree(object sender, VisualTreeAttachmentEventArgs e)
+    private void Target_DetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
     {
         Dispose();
     }
 
-    private void Provider_PropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private void Provider_PropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (_provider is null)
         {

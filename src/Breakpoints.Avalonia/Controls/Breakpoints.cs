@@ -368,7 +368,7 @@ public partial class Breakpoints
         return lowerVisible && upperVisible;
     }
 
-    private static void TargetPropertyChanged(object sender, AvaloniaPropertyChangedEventArgs e)
+    private static void TargetPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
         if (sender is not Layoutable element)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETSTANDARD
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,3 +22,4 @@ internal sealed class NotNullWhenAttribute : Attribute
     /// <summary>Gets the return value condition.</summary>
     public bool ReturnValue { get; }
 }
+#endif

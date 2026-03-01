@@ -1,4 +1,4 @@
-# Breakpoints.Avalonia
+﻿# Breakpoints.Avalonia
 
 [![Nuget](https://img.shields.io/nuget/v/AVVI94.Breakpoints.Avalonia)](https://www.nuget.org/packages/AVVI94.Breakpoints.Avalonia) [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/AVVI94/Breakpoints.Avalonia/master/LICENSE)
 
@@ -6,7 +6,10 @@
 
 ![](https://github.com/AVVI94/Breakpoints.Avalonia/raw/master/gif.gif)
 
-The package should be compatible with Avalonia >= 11.0.10.
+**Important:** Since version `2.4-avalonia12preview1` on **.NET 10.0**, only **Avalonia 12+** is supported due to breaking changes on Avalonia's side.  
+If you want to use an older Avalonia version, please use an **older version** of **this** library.
+
+The package should otherwise be compatible with Avalonia >= 11.0.10 (for older library versions).
 
 ## Table of Contents
 
